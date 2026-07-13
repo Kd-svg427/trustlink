@@ -6,6 +6,10 @@
 <title>TrustLink – Marketplace Ghana</title>
 <meta name="description" content="TrustLink Marketplace Ghana – Buy and sell safely with verified vendors, Mobile Money payments, and fast delivery across Ghana." />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- TrustLink Supabase client + data layer -->
+<script src="supabase.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
@@ -202,6 +206,8 @@
     <nav class="hidden md:flex items-center gap-6">
       <a href="#" class="nav-link" data-page="home">Home</a>
       <a href="#" class="nav-link" data-page="products">Products</a>
+      <a href="#" class="nav-link" data-page="wishlist">Wishlist</a>
+      <a href="#" class="nav-link" data-page="service">Help Desk</a>
       <a href="#" class="nav-link" id="nav-dashboard" style="display:none" data-page="dashboard">Dashboard</a>
       <a href="#" class="nav-link" id="nav-vendor" style="display:none" data-page="vendor-dashboard">My Store</a>
     </nav>
@@ -217,7 +223,7 @@
       <div id="user-menu" class="hidden items-center gap-2">
         <div class="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-sm font-bold text-white" id="user-avatar">U</div>
         <span class="text-sm font-semibold text-neutral-700 hidden md:block" id="user-name-display">User</span>
-        <button onclick="logout()" class="text-xs text-neutral-400 hover:text-red-500 transition-colors ml-1 font-medium">Logout</button>
+        <button onclick="doLogout()" class="text-xs text-neutral-400 hover:text-red-500 transition-colors ml-1 font-medium">Logout</button>
       </div>
       <!-- Auth -->
       <div id="auth-btns" class="flex items-center gap-2">
@@ -235,6 +241,8 @@
   <div id="mobile-menu" class="flex-col px-4 pb-4 gap-1 border-t border-neutral-100 pt-3">
     <a href="#" class="nav-link py-2 flex items-center" data-page="home">Home</a>
     <a href="#" class="nav-link py-2 flex items-center" data-page="products">Products</a>
+    <a href="#" class="nav-link py-2 flex items-center" data-page="wishlist">Wishlist</a>
+    <a href="#" class="nav-link py-2 flex items-center" data-page="service">Help Desk</a>
     <a href="#" class="nav-link py-2 mobile-dashboard" style="display:none" data-page="dashboard">Dashboard</a>
     <a href="#" class="nav-link py-2 mobile-vendor" style="display:none" data-page="vendor-dashboard">My Store</a>
   </div>
@@ -246,6 +254,103 @@
 <main id="app-root"></main>
 <div id="modal-container"></div>
 <div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════
+     VENDOR CTA BANNER
+════════════════════════════════════════ -->
+<section style="padding:32px 24px;background:#f9fafb;">
+  <div style="max-width:1280px;margin:0 auto;">
+    <div style="
+      background:linear-gradient(135deg,#14532d 0%,#166534 50%,#15803d 100%);
+      border-radius:20px;
+      padding:48px 56px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:32px;
+      flex-wrap:wrap;
+      position:relative;
+      overflow:hidden;
+    ">
+      <!-- Dot grid pattern overlay -->
+      <div style="
+        position:absolute;inset:0;pointer-events:none;
+        background-image:radial-gradient(circle,rgba(255,255,255,0.12) 1px,transparent 1px);
+        background-size:24px 24px;
+        border-radius:20px;
+      "></div>
+
+      <!-- Left: Text -->
+      <div style="position:relative;z-index:1;max-width:520px;">
+        <h2 style="font-size:clamp(22px,3vw,32px);font-weight:900;color:white;margin:0 0 12px;line-height:1.2;">
+          Ready to Start <span style="color:#fbbf24;">Selling?</span>
+        </h2>
+        <p style="font-size:15px;color:rgba(255,255,255,0.75);margin:0;line-height:1.65;font-weight:400;">
+          Join thousands of Ghanaian vendors. Setup your store in<br>
+          under 5 minutes and start reaching customers nationwide.
+        </p>
+      </div>
+
+      <!-- Right: Button -->
+      <div style="position:relative;z-index:1;flex-shrink:0;">
+        <button onclick="showPage('register')" style="
+          background:linear-gradient(135deg,#f59e0b,#d97706);
+          color:white;
+          font-size:15px;
+          font-weight:800;
+          padding:16px 36px;
+          border:none;
+          border-radius:50px;
+          cursor:pointer;
+          display:flex;
+          align-items:center;
+          gap:10px;
+          box-shadow:0 8px 24px rgba(245,158,11,0.35);
+          transition:transform 0.2s,box-shadow 0.2s;
+          letter-spacing:0.1px;
+          white-space:nowrap;
+        "
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 32px rgba(245,158,11,0.45)'"
+        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 24px rgba(245,158,11,0.35)'">
+          Become a Vendor 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer style="background:#111827;border-top:1px solid rgba(255,255,255,0.06);">
+  <div style="max-width:1280px;margin:0 auto;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+
+    <!-- Left: Logo + subtitle -->
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:900;line-height:1;color:white;">Trust<span style="color:#f59e0b;">Link</span></div>
+        <div style="font-size:11px;color:#6b7280;font-weight:500;margin-top:3px;">Marketplace Ghana</div>
+      </div>
+    </div>
+
+    <!-- Centre: Ghana flag colour bars -->
+    <div style="display:flex;gap:0;border-radius:4px;overflow:hidden;height:6px;width:120px;flex-shrink:0;">
+      <div style="flex:1;background:#006b3f;"></div>
+      <div style="flex:1;background:#fcd116;"></div>
+      <div style="flex:1;background:#ce1126;"></div>
+    </div>
+
+    <!-- Right: Copyright -->
+    <p style="font-size:12px;color:#6b7280;margin:0;text-align:right;">
+      &copy; 2025 TrustLink Marketplace Ghana. Made with <span style="color:#ef4444;">&#10084;</span> in Ghana.
+    </p>
+
+  </div>
+</footer>
+
 
 <script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -348,6 +453,308 @@ function showPage(page,data=null){
   },120);
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  TRUST VERIFIED BADGE & INFO MODAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function trustVerifiedBadge(showText = false) {
+  return `
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 border border-green-200 text-green-700 cursor-pointer select-none hover:bg-green-100 transition-colors" onclick="event.stopPropagation(); openTrustInfoModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-green-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      ${showText ? '<span>Verified Merchant</span>' : ''}
+    </span>
+  `;
+}
+
+function openTrustInfoModal() {
+  showModal(`
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-4">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h2 class="text-2xl font-black text-neutral-800">TrustLink Verified</h2>
+      <p class="text-sm text-neutral-400 mt-1">This merchant is authenticated under Ghanaian safety checks.</p>
+    </div>
+    <div class="space-y-4 mb-6 text-left text-sm">
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-700 font-bold">1</div>
+        <div>
+          <h4 class="font-bold text-neutral-800">KYC Identity Verification</h4>
+          <p class="text-neutral-500 mt-0.5">Verified against the National Identification Authority (Ghana Card) to eliminate anonymous fraudulent listings.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-700 font-bold">2</div>
+        <div>
+          <h4 class="font-bold text-neutral-800">Mobile Money Wallet Audits</h4>
+          <p class="text-neutral-500 mt-0.5">Payment accounts match MTN MoMo or Vodafone Cash registered merchant names directly.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-700 font-bold">3</div>
+        <div>
+          <h4 class="font-bold text-neutral-800">100% Escrow Protection</h4>
+          <p class="text-neutral-500 mt-0.5">Payments are held securely by TrustLink Ghana escrow administration. Funds are only released to the vendor after you receive and confirm the shipment.</p>
+        </div>
+      </div>
+    </div>
+    <button onclick="closeModal()" class="btn-primary w-full py-3.5 rounded-xl font-bold text-base">Close Info</button>
+  `);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  GPS LOCATION HANDLER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function triggerGPSLocation(fieldId) {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  
+  const btn = event?.currentTarget;
+  let originalHtml = '';
+  if (btn) {
+    originalHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="pulse text-xs">GPS...</span>';
+    btn.disabled = true;
+  }
+  
+  toast('Acquiring GPS coordinates... 📡', 'info');
+  
+  const resetBtn = () => {
+    if (btn) {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    }
+  };
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const regions = [
+          { name: 'Accra', lat: 5.6 },
+          { name: 'Kumasi', lat: 6.7 },
+          { name: 'Takoradi', lat: 4.9 },
+          { name: 'Tamale', lat: 9.4 }
+        ];
+        let closest = 'Accra';
+        let minDist = Infinity;
+        regions.forEach(r => {
+          const dist = Math.abs(r.lat - lat);
+          if (dist < minDist) { minDist = dist; closest = r.name; }
+        });
+        
+        el.value = closest;
+        toast(`Location set: ${closest} (GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}) 📍`, 'success');
+        resetBtn();
+      },
+      (err) => {
+        openMockLocationPicker(el);
+        resetBtn();
+      },
+      { timeout: 5000 }
+    );
+  } else {
+    openMockLocationPicker(el);
+    resetBtn();
+  }
+}
+
+function openMockLocationPicker(inputEl) {
+  showModal(`
+    <h2 class="text-xl font-black mb-4 flex items-center gap-2">
+      <i data-lucide="map" style="width:20px;height:20px;color:#16a34a"></i>
+      Simulated GPS Location
+    </h2>
+    <p class="text-xs text-neutral-400 mb-4">GPS was blocked or unavailable. Choose a simulated GPS hotspot to autofill your city and address:</p>
+    <div class="space-y-2">
+      ${[
+        {name: 'Accra Mall Hotspot (Accra)', city: 'Accra', desc: 'Latitude: 5.6148, Longitude: -0.1681'},
+        {name: 'Kejetia Market (Kumasi)', city: 'Kumasi', desc: 'Latitude: 6.6975, Longitude: -1.6244'},
+        {name: 'Takoradi Circle (Takoradi)', city: 'Takoradi', desc: 'Latitude: 4.8994, Longitude: -1.7584'},
+        {name: 'Tamale Central (Tamale)', city: 'Tamale', desc: 'Latitude: 9.4008, Longitude: -0.8393'},
+        {name: 'Cape Coast Castle (Cape Coast)', city: 'Cape Coast', desc: 'Latitude: 5.1053, Longitude: -1.2411'}
+      ].map(loc => `
+        <button onclick="applyMockLocation('${inputEl.id}', '${loc.city}', '${loc.name}')" class="w-full text-left p-3 rounded-xl border border-neutral-100 hover:border-green-600 hover:bg-green-50/50 transition-all flex items-center justify-between">
+          <div>
+            <div class="font-bold text-sm text-neutral-800">${loc.name}</div>
+            <div class="text-2xs text-neutral-400 mt-0.5">${loc.desc}</div>
+          </div>
+          <span class="text-xs text-green-700 font-semibold bg-green-50 border border-green-200 px-2 py-0.5 rounded-md">${loc.city}</span>
+        </button>
+      `).join('')}
+    </div>
+  `);
+}
+
+function applyMockLocation(fieldId, city, address) {
+  const el = document.getElementById(fieldId);
+  if (el) {
+    el.value = city;
+    const addrEl = document.getElementById('co-address');
+    if (addrEl) addrEl.value = address;
+    toast(`Autocompleted using GPS data: ${city}! 📍`, 'success');
+  }
+  closeModal();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  WISHLIST LOGIC & PAGE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleWishlist(productId) {
+  const u = getCurrentUser();
+  if (!u) { toast('Please log in to manage your wishlist', 'warning'); showPage('login'); return; }
+  let list = DB.get('wishlist', []);
+  const idx = list.indexOf(productId);
+  if (idx > -1) {
+    list.splice(idx, 1);
+    toast('Removed from wishlist', 'info');
+  } else {
+    list.push(productId);
+    toast('Added to wishlist ❤️', 'success');
+  }
+  DB.set('wishlist', list);
+  showPage(currentPage, window._productsFilterCat || null);
+}
+
+function isInWishlist(productId) {
+  return DB.get('wishlist', []).includes(productId);
+}
+
+function pageWishlist() {
+  const wishlist = DB.get('wishlist', []);
+  const allProducts = DB.get('products',[]).filter(p=>p.status==='approved');
+  const products = allProducts.filter(p => wishlist.includes(p.id));
+
+  return `
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-black mb-1">My <span class="gradient-text">Wishlist</span></h1>
+      <p class="text-neutral-400 text-sm font-medium">${products.length} items saved</p>
+    </div>
+    ${products.length === 0 ? `
+    <div class="card text-center py-32">
+      <span class="text-5xl block mb-6">❤️</span>
+      <h2 class="text-xl font-bold text-neutral-500 mb-4">Your wishlist is empty</h2>
+      <button onclick="showPage('products')" class="btn-primary px-8 py-3 rounded-2xl font-semibold">Browse Products</button>
+    </div>` : `
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      ${products.map(p => productCard(p)).join('')}
+    </div>`}
+  </div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  RECENTLY VIEWED PRODUCTS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function recordRecentView(productId) {
+  let views = DB.get('recent_views', []);
+  views = views.filter(id => id !== productId);
+  views.unshift(productId);
+  if (views.length > 5) views.pop();
+  DB.set('recent_views', views);
+}
+
+function renderRecentViewsSection() {
+  const views = DB.get('recent_views', []);
+  if (!views.length) return '';
+  const allProducts = DB.get('products',[]).filter(p=>p.status==='approved');
+  const products = allProducts.filter(p => views.includes(p.id));
+  if (!products.length) return '';
+
+  return `
+  <div class="mt-16 pt-10 border-t border-neutral-200">
+    <h3 class="text-xl font-black mb-6 flex items-center gap-2"><i data-lucide="history" class="text-green-700 w-5 h-5"></i> Recently <span class="gradient-text">Viewed</span></h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      ${products.map(p => `
+      <div class="card p-3 card-hover cursor-pointer" onclick="showPage('product-detail','${p.id}')">
+        <div class="h-28 rounded-lg overflow-hidden mb-2">
+          <img src="${p.images?.[0]||''}" class="w-full h-full object-cover" />
+        </div>
+        <div class="text-xs font-bold text-neutral-800 truncate mb-1">${p.title}</div>
+        <div class="price-tag text-xs font-black">GH₵${p.price.toLocaleString()}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  PAGE: HELP DESK & SERVICE CENTER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function pageService() {
+  return `
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <div class="text-center mb-12">
+      <div class="section-label mx-auto mb-4"><i data-lucide="help-circle" style="width:14px;height:14px"></i> Help &amp; Support</div>
+      <h2 class="section-title">TrustLink <span class="gradient-text">Service Center</span></h2>
+      <p class="text-neutral-400 mt-2 text-sm">Got questions? We've got answers and escrow protection support.</p>
+    </div>
+
+    <!-- FAQ accordion -->
+    <div class="grid md:grid-cols-2 gap-6 mb-12">
+      <div class="card p-6">
+        <h3 class="font-bold text-lg mb-4 text-neutral-800 flex items-center gap-2">📂 Frequently Asked Questions</h3>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-bold text-sm text-neutral-700">What is Escrow Protection?</h4>
+            <p class="text-xs text-neutral-400 mt-1">When you buy an item, your MoMo deposit is locked in our secure trust bank. The vendor will ship the product, and we release the payment only after you confirm receiving the package.</p>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-neutral-700">How do I verify my vendor account?</h4>
+            <p class="text-xs text-neutral-400 mt-1">Upload your Ghana Card during registration or through your store dashboard, verify your MoMo phone number, and wait for Admin approval.</p>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-neutral-700">How long does shipping take?</h4>
+            <p class="text-xs text-neutral-400 mt-1">Delivery takes 1-3 business days depending on your location (Accra, Kumasi, Tamale, Takoradi etc.).</p>
+          </div>
+        </div>
+      </div>
+      <div class="card p-6">
+        <h3 class="font-bold text-lg mb-4 text-neutral-800 flex items-center gap-2">📞 Direct MoMo Support</h3>
+        <div class="p-4 bg-green-50 border border-green-200 rounded-xl space-y-2 mb-4">
+          <div class="text-xs text-neutral-500">Official TrustLink MoMo Channels:</div>
+          <div class="font-bold text-xs text-green-700 flex items-center justify-between"><span>MTN MoMo:</span> <span>024 400 9988 (Escrow Account)</span></div>
+          <div class="font-bold text-xs text-green-700 flex items-center justify-between"><span>Telecel Cash:</span> <span>020 777 6655 (Escrow Account)</span></div>
+        </div>
+        <p class="text-xs text-neutral-400">Do not pay vendors directly. Always use the secure checkout payment options in the app to keep your funds protected.</p>
+      </div>
+    </div>
+
+    <!-- Ticket Form -->
+    <div class="card p-8">
+      <h3 class="font-bold text-xl mb-4 text-neutral-800 flex items-center gap-2"><i data-lucide="message-square" class="text-green-700"></i> Submit a Support Ticket</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Name</label>
+          <input id="support-name" class="input-field" placeholder="Kofi Mensah" value="${getCurrentUser()?.name||''}" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Issue Category</label>
+          <select id="support-category" class="input-field">
+            <option>Escrow Dispute</option>
+            <option>Payment Issue</option>
+            <option>Delivery Delay</option>
+            <option>Vendor Verification</option>
+            <option>Other Enquiry</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Message details</label>
+          <textarea id="support-msg" class="input-field" rows="4" placeholder="Describe the issue in detail..."></textarea>
+        </div>
+        <button onclick="submitTicket()" class="btn-primary w-full py-4 rounded-xl font-bold">Submit Ticket</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function submitTicket() {
+  const name = document.getElementById('support-name')?.value.trim();
+  const cat = document.getElementById('support-category')?.value;
+  const msg = document.getElementById('support-msg')?.value.trim();
+  if(!name || !msg) { toast('Please fill all support ticket fields','warning'); return; }
+  toast('Support ticket submitted! We will contact you soon.','success');
+  document.getElementById('support-msg').value = '';
+}
+
 function renderPage(page,data){
   const wrap=document.createElement('div');
   wrap.className='fade-up';
@@ -362,6 +769,8 @@ function renderPage(page,data){
     case 'dashboard': wrap.innerHTML=pageDashboard(); break;
     case 'vendor-dashboard': wrap.innerHTML=pageVendorDashboard(); break;
     case 'order-success': wrap.innerHTML=pageOrderSuccess(data); break;
+    case 'wishlist': wrap.innerHTML=pageWishlist(); break;
+    case 'service': wrap.innerHTML=pageService(); break;
     default: wrap.innerHTML='<div class="text-center py-40 text-neutral-400">Page not found</div>';
   }
   wrap.querySelectorAll('[data-page]').forEach(el=>{
@@ -474,9 +883,18 @@ _Powered by TrustLink Ghana_`;
   window.open(url,'_blank');
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  PAGE: HOME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function doHomeSearch(q){
+  if(!q.trim()) return;
+  showPage('products');
+  setTimeout(()=>{
+    const searchInput = document.getElementById('product-search');
+    if(searchInput){
+      searchInput.value = q;
+      searchProducts(q);
+    }
+  },200);
+}
+
 function pageHome(){
   const products=DB.get('products',[]).filter(p=>p.status==='approved');
   const vendors=DB.get('users',[]).filter(u=>u.role==='vendor'&&u.status==='approved');
@@ -491,177 +909,190 @@ function pageHome(){
   ];
 
   return `
-  <!-- ── HERO ── -->
-  <section class="hero-section">
-    <div class="hero-pattern"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center relative z-10">
-      <div>
-        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-xs font-bold mb-6 backdrop-blur-sm">
-          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          Ghana's #1 Trusted Marketplace
-        </div>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-5">
-          Shop & Sell:<br/>
-          <span style="color:#FCD116">The Ghanaian</span><br/>
-          <span style="color:#FCD116">Way</span>
-        </h1>
-        <p class="text-green-100 text-base md:text-lg mb-8 leading-relaxed max-w-md">From authentic Kente cloth to the latest tech — buy and sell safely with verified vendors. Pay with Mobile Money, delivered to your door.</p>
-        <div class="flex flex-wrap gap-3">
-          <button onclick="showPage('products')" class="btn-gold px-7 py-4 rounded-2xl font-bold flex items-center gap-2 text-base">
-            <i data-lucide="shopping-bag" style="width:18px;height:18px"></i> Shop Now
-          </button>
-          <button onclick="showPage('register')" class="bg-white/15 border border-white/30 text-white px-7 py-4 rounded-2xl font-bold flex items-center gap-2 text-base hover:bg-white/25 transition-all backdrop-blur-sm">
-            <i data-lucide="store" style="width:18px;height:18px"></i> Start Selling
-          </button>
-        </div>
-        <!-- Stats -->
-        <div class="flex items-center gap-6 mt-10 pt-8 border-t border-white/15">
-          ${[{v:products.length+'+',l:'Products'},{v:vendors.length+'+',l:'Vendors'},{v:orders.length+'+',l:'Orders Placed'},{v:'100%',l:'Secure'}].map(s=>`
-          <div><div class="text-2xl font-black text-white">${s.v}</div><div class="text-green-300 text-xs font-medium mt-0.5">${s.l}</div></div>
-          `).join('<div class="w-px h-10 bg-white/15"></div>')}
-        </div>
-      </div>
-      <!-- Hero image -->
-      <div class="hidden md:block relative">
-        <div class="hero-img-wrapper">
-          <img src="assets/hero.jpg" alt="Shop & Sell the Ghanaian Way"
-               class="w-full h-auto object-cover"
-               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1618516976529-60cbfb32ea5b?w=700&q=85'" />
-        </div>
-        <!-- Floating badge -->
-        <div class="absolute -bottom-4 -left-6 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-neutral-100">
-          <div class="w-10 h-10 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
-            <i data-lucide="shield-check" style="width:20px;height:20px;color:white"></i>
-          </div>
-          <div><div class="text-sm font-bold text-neutral-800">Verified Vendor</div><div class="text-xs text-neutral-400">KYC Approved</div></div>
-        </div>
-        <div class="absolute -top-4 -right-4 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-neutral-100">
-          <span class="text-2xl">📱</span>
-          <div><div class="text-sm font-bold text-neutral-800">Mobile Money</div><div class="text-xs text-neutral-400">MTN • Vodafone</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- ══ HERO ══ -->
+  <section style="background:linear-gradient(160deg,#14532d 0%,#166534 55%,#15803d 100%);position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;"></div>
+    <div style="max-width:800px;margin:0 auto;padding:32px 24px 36px;position:relative;z-index:1;">
 
-  <!-- ── TRUST BADGES ── -->
-  <section class="bg-white border-b border-neutral-100 py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-      ${[
-        {icon:'shield-check',label:'Verified Vendors',desc:'All sellers are KYC verified',color:'text-green-600',bg:'bg-green-50'},
-        {icon:'smartphone',label:'Mobile Money',desc:'MTN MoMo & Vodafone Cash',color:'text-yellow-600',bg:'bg-yellow-50'},
-        {icon:'truck',label:'Fast Delivery',desc:'Nationwide delivery',color:'text-blue-600',bg:'bg-blue-50'},
-        {icon:'message-circle',label:'WhatsApp Support',desc:'Direct vendor contact',color:'text-emerald-600',bg:'bg-emerald-50'},
-      ].map(b=>`
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl ${b.bg} flex items-center justify-center flex-shrink-0">
-          <i data-lucide="${b.icon}" style="width:22px;height:22px" class="${b.color}"></i>
-        </div>
-        <div>
-          <div class="font-bold text-sm text-neutral-800">${b.label}</div>
-          <div class="text-xs text-neutral-400 mt-0.5">${b.desc}</div>
-        </div>
+      <!-- Badge -->
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.92);padding:6px 16px;border-radius:50px;font-size:12px;font-weight:700;margin-bottom:14px;letter-spacing:0.2px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;flex-shrink:0;"></span>
+        Ghana's #1 Trusted Marketplace
       </div>
-      `).join('')}
-    </div>
-  </section>
 
-  <!-- ── CATEGORIES ── -->
-  <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="text-center mb-12">
-      <div class="section-label mx-auto mb-4"><i data-lucide="grid-3x3" style="width:14px;height:14px"></i> Browse By Category</div>
-      <h2 class="section-title">Shop <span class="gradient-text">Categories</span></h2>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      ${cats.map(c=>`
-      <div class="card card-hover cursor-pointer p-5 text-center border ${c.color}" onclick="showPage('products','${c.name}')">
-        <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mx-auto mb-3 shadow-sm">
-          <i data-lucide="${c.icon}" style="width:22px;height:22px" class="${c.iconColor}"></i>
-        </div>
-        <div class="font-bold text-sm text-neutral-800">${c.name}</div>
-        <div class="text-xs text-neutral-400 mt-1">${c.count} items</div>
-      </div>
-      `).join('')}
-    </div>
-  </section>
+      <!-- Headline -->
+      <h1 style="font-size:clamp(32px,5vw,52px);font-weight:900;color:#fcd34d;line-height:1.12;margin:0 0 14px;letter-spacing:-0.5px;">
+        Shop &amp; Sell:<br>The Ghanaian Way
+      </h1>
 
-  <!-- ── FEATURED PRODUCTS ── -->
-  <section class="py-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="flex items-center justify-between mb-10">
-      <div>
-        <div class="section-label mb-3"><i data-lucide="star" style="width:14px;height:14px"></i> Top Picks</div>
-        <h2 class="section-title">Featured <span class="gradient-text">Products</span></h2>
-      </div>
-      <button onclick="showPage('products')" class="btn-outline px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-        View All <i data-lucide="arrow-right" style="width:15px;height:15px"></i>
-      </button>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-      ${products.slice(0,8).map(p=>productCard(p)).join('')}
-    </div>
-  </section>
+      <!-- Sub -->
+      <p style="font-size:15px;color:rgba(255,255,255,0.78);line-height:1.65;margin:0 0 22px;max-width:500px;">
+        From authentic Kente cloth to the latest tech &mdash; buy and sell safely with
+        verified vendors. Pay with Mobile Money, delivered nationwide.
+      </p>
 
-  <!-- ── CTA BANNER ── -->
-  <section class="py-10 pb-24 max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="rounded-3xl overflow-hidden relative" style="background:linear-gradient(135deg,#052e16 0%,#166534 100%)">
-      <div class="hero-pattern"></div>
-      <div class="relative z-10 p-10 md:p-16 text-center md:text-left md:flex items-center justify-between gap-10">
-        <div>
-          <h2 class="text-3xl md:text-4xl font-black text-white mb-3">Ready to Start <span style="color:#FCD116">Selling?</span></h2>
-          <p class="text-green-200 max-w-md">Join thousands of Ghanaian vendors. Setup your store in under 5 minutes and start reaching customers nationwide.</p>
-        </div>
-        <button onclick="showPage('register')" class="btn-gold mt-6 md:mt-0 px-10 py-4 rounded-2xl font-bold text-base whitespace-nowrap flex-shrink-0">
-          Become a Vendor 🚀
+      <!-- Search bar -->
+      <div style="position:relative;max-width:500px;margin-bottom:20px;">
+        <svg style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="home-search" placeholder="Search products, categories..."
+          onkeydown="if(event.key==='Enter') doHomeSearch(this.value)"
+          style="width:100%;padding:13px 110px 13px 46px;border-radius:50px;border:none;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,0.15);" />
+        <button onclick="doHomeSearch(document.getElementById('home-search').value)"
+          style="position:absolute;right:5px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,#16a34a,#22c55e);color:white;border:none;border-radius:50px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
+          Search
         </button>
       </div>
+
+      <!-- CTA Buttons -->
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px;">
+        <button onclick="showPage('products')"
+          style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;padding:15px 32px;border-radius:50px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:9px;box-shadow:0 6px 20px rgba(245,158,11,0.4);letter-spacing:0.1px;transition:filter .15s,transform .15s;"
+          onmouseover="this.style.filter='brightness(1.08)';this.style.transform='translateY(-1px)'"
+          onmouseout="this.style.filter='none';this.style.transform='none'">
+          &#128717; Shop Now
+        </button>
+        <button onclick="showPage('register')"
+          style="background:rgba(255,255,255,0.1);color:white;border:2px solid rgba(255,255,255,0.3);padding:15px 32px;border-radius:50px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:9px;letter-spacing:0.1px;transition:background .15s;"
+          onmouseover="this.style.background='rgba(255,255,255,0.2)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+          &#127978; Start Selling
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0;padding-top:18px;border-top:1px solid rgba(255,255,255,0.12);">
+        ${[{v:products.length+'+',l:'Products'},{v:vendors.length+'+',l:'Vendors'},{v:orders.length+'+',l:'Orders Placed'},{v:'100%',l:'Secure'}].map((s,i)=>`
+          ${i>0?'<div style="width:1px;height:34px;background:rgba(255,255,255,0.18);flex-shrink:0;margin:0 24px;"></div>':''}
+          <div>
+            <div style="font-size:24px;font-weight:900;color:white;line-height:1;">${s.v}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;font-weight:500;letter-spacing:0.2px;">${s.l}</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="bg-neutral-900 text-neutral-400 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-brand flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  <!-- ══ TRUST ROW ══ -->
+  <section style="background:#fff;border-bottom:1px solid #e5e7eb;padding:22px 24px;">
+    <div style="max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      ${[
+        {icon:'shield-check',emoji:'',label:'Verified KYC',desc:'Sellers approved',color:'#16a34a'},
+        {icon:'smartphone',emoji:'',label:'Mobile Money',desc:'MTN & Vodafone',color:'#d97706'},
+        {icon:'truck',emoji:'',label:'Nationwide',desc:'Fast delivery',color:'#2563eb'},
+      ].map(b=>`
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:${b.color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i data-lucide="${b.icon}" style="width:18px;height:18px;color:${b.color};"></i>
           </div>
           <div>
-            <div class="font-black text-white text-lg">Trust<span class="text-yellow-400">Link</span></div>
-            <div class="text-xs text-neutral-500">Marketplace Ghana</div>
+            <div style="font-size:13px;font-weight:700;color:#111827;line-height:1.2;">${b.label}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:2px;">${b.desc}</div>
           </div>
         </div>
-        <div class="ghana-bar w-32 rounded-full"></div>
-        <p class="text-xs text-neutral-500 text-center">© 2025 TrustLink Marketplace Ghana. Made with ❤️ in Ghana.</p>
+      `).join('')}
+    </div>
+  </section>
+
+  <!-- ══ CATEGORIES ══ -->
+  <section style="padding:36px 24px 28px;background:#f9fafb;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <h2 style="font-size:20px;font-weight:800;color:#111827;margin:0 0 20px;letter-spacing:-0.3px;">Browse by Category</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+        ${cats.map(c=>`
+        <div onclick="showPage('products','${c.name}')"
+          style="background:white;border:1px solid #e5e7eb;border-radius:16px;padding:20px 12px;text-align:center;cursor:pointer;transition:box-shadow .2s,transform .2s;"
+          onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.10)';this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+          <div style="width:44px;height:44px;border-radius:12px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+            <i data-lucide="${c.icon}" style="width:22px;height:22px;color:#16a34a;"></i>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#111827;line-height:1.3;">${c.name}</div>
+        </div>
+        `).join('')}
       </div>
     </div>
-  </footer>
+  </section>
+
+  <!-- ══ FEATURED PRODUCTS ══ -->
+  <section style="padding:28px 24px 48px;background:#f9fafb;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:800;color:#111827;margin:0;letter-spacing:-0.3px;">Featured Products</h2>
+        <button onclick="showPage('products')"
+          style="font-size:13px;font-weight:700;color:#16a34a;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;"
+          onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+          View All &#8594;
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+        ${products.slice(0,8).map(fp=>productCard(fp)).join('')}
+      </div>
+    </div>
+  </section>
   `;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  PRODUCT CARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function productCard(p){
-  const vendor=DB.get('users',[]).find(u=>u.id===p.vendorId);
+  // Use inlined vendor (from Supabase flattenProduct) or fall back to localStorage seed data
+  const vendor = p.vendor || DB.get('users',[]).find(u=>u.id===p.vendorId) || {};
   const stars='★'.repeat(Math.floor(p.rating||4))+'☆'.repeat(5-Math.floor(p.rating||4));
+  const isWish = isInWishlist(p.id);
+  const isVerified = vendor?.status === 'approved';
   return `
-  <div class="card card-product card-hover cursor-pointer overflow-hidden" onclick="showPage('product-detail','${p.id}')">
+  <div class="card card-product card-hover cursor-pointer overflow-hidden relative" onclick="showPage('product-detail','${p.id}')">
+    <!-- Image Area -->
     <div class="relative overflow-hidden" style="height:200px;border-radius:14px 14px 0 0">
       <img src="${p.images?.[0]||'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600'}" alt="${p.title}"
            class="w-full h-full object-cover"
            onerror="this.src='https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600'" />
+      
+      <!-- Category Badge -->
       <div class="absolute top-2.5 left-2.5"><span class="badge-cat">${p.category}</span></div>
+      
+      <!-- Wishlist Toggle -->
+      <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" 
+              class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow transition-all text-red-500">
+        <i data-lucide="${isWish ? 'heart' : 'heart-off'}" style="width:16px;height:16px;fill:${isWish ? 'currentColor' : 'none'}"></i>
+      </button>
+
+      <!-- Floating Image Verification Badge -->
+      ${isVerified ? `
+      <div class="absolute bottom-2 right-2 bg-white/90 border border-green-200 text-green-700 rounded-lg px-1.5 py-0.5 text-[10px] font-bold flex items-center gap-0.5 shadow-sm backdrop-blur-sm" onclick="event.stopPropagation(); openTrustInfoModal()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-green-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Verified</span>
+      </div>` : ''}
     </div>
+    
+    <!-- Details Area -->
     <div class="p-4">
       <p class="font-semibold text-sm text-neutral-800 leading-snug mb-1" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
-      <p class="text-xs text-neutral-400 mb-2 font-medium">${vendor?.storeName||'Unknown Store'}</p>
+      
+      <!-- Inline Store Name + Verified Badge -->
+      <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+        <span class="text-xs text-neutral-400 font-medium">${vendor?.storeName||'Unknown Store'}</span>
+        ${isVerified ? trustVerifiedBadge(false) : ''}
+      </div>
+
       <div class="stars text-xs mb-3">${stars} <span class="text-neutral-400 font-normal">(${p.reviews||0})</span></div>
-      <div class="flex items-center justify-between">
+      
+      <div class="flex items-center justify-between gap-2">
         <div class="price-tag text-base font-black">GH₵ ${p.price.toLocaleString()}</div>
-        <button onclick="event.stopPropagation();addToCartQuick('${p.id}')"
-          class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center hover:shadow-lg transition-all"
-          title="Add to cart">
-          <i data-lucide="shopping-cart" style="width:15px;height:15px;color:white"></i>
-        </button>
+        <div class="flex items-center gap-1.5">
+          <!-- WhatsApp Quick Order Button -->
+          ${vendor?.whatsapp ? `
+          <button onclick="event.stopPropagation();quickWhatsAppOrder('${p.id}')"
+            class="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center hover:shadow-lg transition-all"
+            title="WhatsApp Order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </button>` : ''}
+          <button onclick="event.stopPropagation();addToCartQuick('${p.id}')"
+            class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center hover:shadow-lg transition-all"
+            title="Add to cart">
+            <i data-lucide="shopping-cart" style="width:15px;height:15px;color:white"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>`;
@@ -674,9 +1105,6 @@ function addToCartQuick(productId){
   addToCart(productId,1);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  PAGE: PRODUCTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function pageProducts(categoryFilter=null){
   let all=DB.get('products',[]).filter(p=>p.status==='approved');
   const cats=['All','Electronics','Fashion & Clothing','Jewelry & Accessories','Home & Living','Food & Beverages','Health & Beauty','Agriculture','Art & Crafts','Sports & Outdoors'];
@@ -713,27 +1141,82 @@ function filterProducts(cat){showPage('products',cat==='All'?null:cat);}
 function searchProducts(q){
   const all=DB.get('products',[]).filter(p=>p.status==='approved');
   const filtered=q?all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||p.description.toLowerCase().includes(q.toLowerCase())):all;
-  document.getElementById('products-grid').innerHTML=filtered.length?filtered.map(p=>productCard(p)).join(''):emptyState('search-x','No products match your search');
-  lucide.createIcons();
+  const gridEl = document.getElementById('products-grid');
+  if(gridEl) {
+    gridEl.innerHTML=filtered.length?filtered.map(p=>productCard(p)).join(''):emptyState('search-x','No products match your search');
+    lucide.createIcons();
+  }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  PAGE: PRODUCT DETAIL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function quickWhatsAppOrder(productId){
+  const p=DB.get('products',[]).find(pr=>pr.id===productId);
+  if(!p)return;
+  const vendor = p.vendor || DB.get('users',[]).find(u=>u.id===p.vendorId) || {};
+  if(!vendor||!vendor.whatsapp){
+    toast('Vendor contact not available','warning');
+    return;
+  }
+  const msg=`Hello ${vendor.storeName || 'Vendor'}, I am interested in your product "${p.title}" (GH₵${p.price.toLocaleString()}) listed on TrustLink. Is it available for purchase?`;
+  const url=`https://wa.me/233${vendor.whatsapp.replace(/^0/,'')}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
+async function submitVendorReview(vendorId){
+  const u=getCurrentUser();
+  if(!u){toast('Please login to leave feedback','warning');showPage('login');return;}
+  if(u.role!=='buyer'){toast('Only buyers can leave feedback','warning');return;}
+  const rating=parseInt(document.getElementById('vr-rating')?.value || '5');
+  const comment=document.getElementById('vr-comment')?.value.trim();
+  if(!comment){toast('Please enter your comment','warning');return;}
+  
+  // Save to Supabase if available, mirror to localStorage
+  try{
+    if(supabase&&u.id&&!u.id.startsWith('usr')){
+      await SBReviews.submit(vendorId, rating, comment);
+    }
+  }catch(e){console.warn('Supabase review save failed:',e);}
+
+  const reviews=DB.get('vendor_reviews',[]);
+  reviews.push({id:'rev'+genId(),vendorId,buyerId:u.id,buyerName:u.name,rating,comment,createdAt:new Date().toISOString()});
+  DB.set('vendor_reviews',reviews);
+  
+  const products=DB.get('products',[]);
+  products.forEach(p=>{
+    if(p.vendorId===vendorId){
+      const pReviews = reviews.filter(r => r.vendorId === vendorId);
+      p.reviews = pReviews.length;
+      p.rating = parseFloat((pReviews.reduce((sum, r) => sum + r.rating, 0) / pReviews.length).toFixed(1));
+    }
+  });
+  DB.set('products',products);
+  
+  toast('Feedback submitted successfully! Thank you.','success');
+  showPage('product-detail', window._currentViewedProduct);
+}
+
 function pageProductDetail(productId){
+  window._currentViewedProduct = productId;
+  recordRecentView(productId);
   const products=DB.get('products',[]);
   const p=products.find(pr=>pr.id===productId);
   if(!p)return '<div class="text-center py-40 text-neutral-400">Product not found</div>';
-  const vendor=DB.get('users',[]).find(u=>u.id===p.vendorId);
+  const vendor = p.vendor || DB.get('users',[]).find(u=>u.id===p.vendorId) || {};
+  const isVerified = vendor?.status === 'approved';
   const stars='★'.repeat(Math.floor(p.rating||4))+'☆'.repeat(5-Math.floor(p.rating||4));
   const related=products.filter(pr=>pr.status==='approved'&&pr.category===p.category&&pr.id!==p.id).slice(0,4);
+  
+  const waMsg = `Hello ${vendor?.storeName || 'Vendor'}, I am interested in your product "${p.title}" listed on TrustLink Ghana. Is it available for order? Link: ${window.location.origin}/product/${p.id}`;
+  const waUrl = vendor?.whatsapp ? `https://wa.me/233${vendor.whatsapp.replace(/^0/,'')}?text=${encodeURIComponent(waMsg)}` : '#';
+
+  const vendorReviews = DB.get('vendor_reviews',[]).filter(r=>r.vendorId===p.vendorId);
+  const avgRating = vendorReviews.length ? (vendorReviews.reduce((sum,r)=>sum+r.rating,0)/vendorReviews.length).toFixed(1) : '4.8';
+
   return `
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
     <button onclick="showPage('products')" class="flex items-center gap-2 text-neutral-500 hover:text-green-700 mb-8 transition-colors font-medium text-sm">
       <i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back to Products
     </button>
     <div class="grid md:grid-cols-2 gap-12 mb-16">
-      <!-- Images -->
       <div>
         <div class="card overflow-hidden product-img-main mb-3" style="height:380px">
           <img id="main-img" src="${p.images?.[0]||'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=700'}" alt="${p.title}"
@@ -746,7 +1229,6 @@ function pageProductDetail(productId){
             onerror="this.style.display='none'" />`).join('')}
         </div>`:''}
       </div>
-      <!-- Info -->
       <div>
         <span class="badge-cat mb-3 inline-block">${p.category}</span>
         <h1 class="text-3xl font-black text-neutral-900 mb-3">${p.title}</h1>
@@ -755,32 +1237,32 @@ function pageProductDetail(productId){
           <span class="text-neutral-400 text-sm font-medium">${p.reviews||0} reviews</span>
         </div>
         <div class="text-4xl font-black price-tag mb-6">GH₵ ${p.price.toLocaleString()}</div>
-        <!-- Description -->
         <div class="bg-neutral-50 rounded-2xl p-5 border border-neutral-100 mb-6">
           <p class="text-neutral-600 text-sm leading-relaxed">${p.description}</p>
         </div>
-        <!-- Vendor -->
-        <div class="card p-4 mb-5 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-brand flex items-center justify-center text-xl font-black text-white">
+        <div class="card p-5 mb-5 flex items-center gap-4 border border-green-100 bg-green-50/20">
+          <div class="w-12 h-12 rounded-xl bg-brand flex items-center justify-center text-xl font-black text-white flex-shrink-0">
             ${vendor?.storeName?.charAt(0)||'V'}
           </div>
           <div class="flex-1">
-            <div class="font-bold text-neutral-800">${vendor?.storeName||'Unknown Store'}</div>
-            <div class="text-xs text-neutral-400 font-medium mt-0.5 flex items-center gap-1">
-              <i data-lucide="map-pin" style="width:12px;height:12px"></i> ${vendor?.location||'Ghana'}
+            <div class="font-bold text-neutral-800 flex items-center gap-2">
+              <span>${vendor?.storeName||'Unknown Store'}</span>
+              ${isVerified ? trustVerifiedBadge(true) : ''}
+            </div>
+            <div class="text-xs text-neutral-400 font-medium mt-0.5 flex items-center gap-3">
+              <span class="flex items-center gap-1"><i data-lucide="map-pin" style="width:12px;height:12px"></i> ${vendor?.location||'Ghana'}</span>
+              <span class="flex items-center gap-1 text-gold-600 font-semibold">★ ${avgRating} Rating</span>
             </div>
           </div>
-          ${vendor?.whatsapp?`<a href="https://wa.me/233${vendor.whatsapp.replace(/^0/,'')}" target="_blank"
-              class="btn-whatsapp flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold">
-              <i data-lucide="message-circle" style="width:16px;height:16px"></i> WhatsApp
+          ${vendor?.whatsapp?`<a href="${waUrl}" target="_blank"
+              class="btn-whatsapp flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-green-500/20">
+              <i data-lucide="message-circle" style="width:16px;height:16px"></i> Chat with Vendor
             </a>`:''}
         </div>
-        <!-- Stock -->
         <div class="flex items-center gap-2 mb-6">
           <div class="w-2 h-2 rounded-full ${p.stock>0?'bg-green-500':'bg-red-500'}"></div>
           <span class="text-sm font-semibold ${p.stock>0?'text-green-600':'text-red-600'}">${p.stock>0?`${p.stock} in stock`:'Out of stock'}</span>
         </div>
-        <!-- Qty + Add to cart -->
         <div class="flex items-center gap-4 mb-4">
           <div class="flex items-center gap-3 bg-neutral-100 rounded-xl px-4 py-3 border border-neutral-200">
             <button onclick="changeQty(-1)" class="text-neutral-500 hover:text-green-700 transition-colors"><i data-lucide="minus" style="width:16px;height:16px"></i></button>
@@ -801,7 +1283,52 @@ function pageProductDetail(productId){
         </div>
       </div>
     </div>
-    ${related.length?`<h2 class="text-2xl font-black mb-6">You May Also <span class="gradient-text">Like</span></h2>
+    <div class="grid md:grid-cols-3 gap-8 mb-16 pt-10 border-t border-neutral-200">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-black text-neutral-800 mb-2">Vendor Reviews</h3>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-4xl font-black text-neutral-900">${avgRating}</span>
+          <div>
+            <div class="stars text-sm">★ ★ ★ ★ ★</div>
+            <div class="text-xs text-neutral-400 font-medium">${vendorReviews.length} verified ratings</div>
+          </div>
+        </div>
+        <div class="divider my-4"></div>
+        ${getCurrentUser()?.role === 'buyer' ? `
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-neutral-700">Leave vendor feedback</h4>
+          <div>
+            <label class="text-[10px] font-bold text-neutral-400 mb-1 block uppercase">Rating</label>
+            <select id="vr-rating" class="input-field py-2">
+              <option value="5">5 Stars - Excellent</option>
+              <option value="4">4 Stars - Very Good</option>
+              <option value="3">3 Stars - Good</option>
+              <option value="2">2 Stars - Fair</option>
+              <option value="1">1 Star - Poor</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-neutral-400 mb-1 block uppercase">Your Review</label>
+            <textarea id="vr-comment" class="input-field text-sm" rows="3" placeholder="Share your experience with this vendor..."></textarea>
+          </div>
+          <button onclick="submitVendorReview('${p.vendorId}')" class="btn-primary w-full py-2.5 rounded-xl font-bold text-sm">Submit Review</button>
+        </div>` : `<p class="text-xs text-neutral-400">Log in as a buyer to leave vendor feedback.</p>`}
+      </div>
+      <div class="md:col-span-2 space-y-4">
+        <h4 class="font-bold text-sm text-neutral-700">What buyers say:</h4>
+        ${vendorReviews.length ? vendorReviews.map(r=>`
+        <div class="bg-white border border-neutral-100 rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-xs text-neutral-800">${r.buyerName}</span>
+            <span class="text-[10px] text-neutral-400">${new Date(r.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div class="stars text-xs mb-2">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+          <p class="text-xs text-neutral-500 leading-relaxed">${r.comment}</p>
+        </div>`).join('') : `<p class="text-xs text-neutral-400 font-medium py-10 text-center">No reviews yet for this vendor.</p>`}
+      </div>
+    </div>
+    ${renderRecentViewsSection()}
+    ${related.length?`<h2 class="text-2xl font-black mb-6 mt-16">You May Also <span class="gradient-text">Like</span></h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-5">${related.map(rp=>productCard(rp)).join('')}</div>`:''}
   </div>`;
 }
@@ -934,10 +1461,15 @@ function pageCheckout(){
             </div>
             <div>
               <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">City / Location</label>
-              <select id="co-location" class="input-field">
-                <option value="">Select your city</option>
-                ${['Accra','Kumasi','Tamale','Takoradi','Cape Coast','Koforidua','Sunyani','Ho','Bolgatanga','Wa'].map(c=>`<option>${c}</option>`).join('')}
-              </select>
+              <div class="flex gap-2">
+                <select id="co-location" class="input-field flex-1">
+                  <option value="">Select your city</option>
+                  ${['Accra','Kumasi','Tamale','Takoradi','Cape Coast','Koforidua','Sunyani','Ho','Bolgatanga','Wa'].map(c=>`<option>${c}</option>`).join('')}
+                </select>
+                <button type="button" onclick="triggerGPSLocation('co-location')" class="btn-gold px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <i data-lucide="map-pin" style="width:16px;height:16px"></i> Auto GPS
+                </button>
+              </div>
             </div>
             <div>
               <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Delivery Notes (optional)</label>
@@ -1080,7 +1612,7 @@ function placeOrder(){
         total,commission,
         deliveryAddress:`${address}, ${location}`,
         paymentMethod:pmLabel,
-        status:'confirmed',
+        status:'awaiting-deposit',
         buyerName:name,buyerPhone:phone,
         createdAt:new Date().toISOString(),
       };
@@ -1198,20 +1730,7 @@ function pageLogin(){
           </div>
           <button onclick="doLogin()" class="btn-primary w-full py-4 rounded-2xl font-bold text-base mt-2">Sign In</button>
         </div>
-        <!-- Demo accounts -->
-        <div class="mt-5 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-          <p class="text-xs font-bold text-neutral-400 mb-3 uppercase tracking-wide">Quick demo login:</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="fillDemo('kofi@gmail.com','buyer123')" class="text-left p-3 rounded-xl border border-neutral-200 hover:border-green-300 hover:bg-green-50 transition-all">
-              <div class="text-xs font-bold text-green-700">Buyer</div>
-              <div class="text-xs text-neutral-400 mt-0.5">kofi@gmail.com</div>
-            </button>
-            <button onclick="fillDemo('kwame@kente.gh','vendor123')" class="text-left p-3 rounded-xl border border-neutral-200 hover:border-yellow-300 hover:bg-yellow-50 transition-all">
-              <div class="text-xs font-bold text-yellow-700">Vendor</div>
-              <div class="text-xs text-neutral-400 mt-0.5">kwame@kente.gh</div>
-            </button>
-          </div>
-        </div>
+
         <div class="divider my-5"></div>
         <p class="text-center text-sm text-neutral-400">Don't have an account? <a href="#" onclick="showPage('register')" class="text-green-700 font-bold hover:underline">Sign Up</a></p>
       </div>
@@ -1219,21 +1738,83 @@ function pageLogin(){
   </div>`;
 }
 
-function fillDemo(email,pw){document.getElementById('login-email').value=email;document.getElementById('login-password').value=pw;}
-function doLogin(){
+
+async function doLogin(){
   const email=document.getElementById('login-email')?.value.trim();
   const password=document.getElementById('login-password')?.value;
   if(!email||!password){toast('Please enter email and password','warning');return;}
-  const user=DB.get('users',[]).find(u=>u.email===email&&u.password===password);
-  if(!user){toast('Invalid email or password','error');return;}
-  if(user.status==='rejected'){toast('Your account has been rejected. Contact support.','error');return;}
-  if(user.role==='vendor'&&user.status==='pending'){toast('Vendor account pending admin approval','warning');return;}
-  setCurrentUser(user);
-  toast(`Welcome back, ${user.name.split(' ')[0]}! 👋`,'success');
-  if(user.role==='vendor')showPage('vendor-dashboard');
-  else if(user.role==='admin')showPage('dashboard');
-  else showPage('home');
+  const btn=document.querySelector('[onclick="doLogin()"]');
+  if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+  try{
+    const user = await sbLogin(email, password);
+    if(user.status==='suspended'){await sbLogout();toast('Your account has been suspended. Contact support.','error');if(btn){btn.disabled=false;btn.textContent='Sign In';}return;}
+    if(user.role==='vendor'&&user.status==='pending'){
+      showModal(`
+        <div class="text-center py-4">
+          <div class="text-5xl mb-4">⏳</div>
+          <h2 class="text-xl font-black mb-2">Pending Admin Approval</h2>
+          <p class="text-neutral-500 text-sm mb-4">Your vendor account is currently being reviewed.<br>
+          You'll receive an email once approved. This usually takes <strong>up to 24 hours</strong>.</p>
+          <button onclick="closeModal()" class="btn-primary px-8 py-3 rounded-2xl font-bold">OK, Got It</button>
+        </div>
+      `);
+      if(btn){btn.disabled=false;btn.textContent='Sign In';}
+      return;
+    }
+    setCurrentUser(user);
+    toast(`Welcome back, ${user.name.split(' ')[0]}! 👋`,'success');
+    if(user.role==='vendor')showPage('vendor-dashboard');
+    else if(user.role==='admin')showPage('dashboard');
+    else showPage('home');
+  }catch(err){
+    const msg = err.message || '';
+    if(btn){btn.disabled=false;btn.textContent='Sign In';}
+
+    // ── Email not confirmed ─────────────────────────────────────────
+    if(msg.toLowerCase().includes('email not confirmed') || msg.toLowerCase().includes('not confirmed')){
+      showModal(`
+        <div class="text-center py-4">
+          <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">📧</span>
+          </div>
+          <h2 class="text-xl font-black mb-2">Verify Your Email First</h2>
+          <p class="text-neutral-500 text-sm mb-1">We sent a verification link to:</p>
+          <p class="font-bold text-green-700 text-sm mb-4">${email}</p>
+          <p class="text-neutral-400 text-xs mb-6">Open that email and click the link to activate your account,<br>then come back here to sign in.</p>
+          <div class="flex flex-col gap-3">
+            <button onclick="resendVerificationEmail('${email}');closeModal()" class="btn-ghost py-3 rounded-xl font-semibold text-sm border border-neutral-200">
+              📩 Resend Verification Email
+            </button>
+            <button onclick="closeModal()" class="btn-primary py-3 rounded-xl font-bold">
+              OK, I'll Check My Email
+            </button>
+          </div>
+        </div>
+      `);
+      return;
+    }
+
+    // ── Wrong password / user not found ─────────────────────────────
+    if(msg.toLowerCase().includes('invalid login') || msg.toLowerCase().includes('invalid credentials')){
+      toast('Incorrect email or password. Please try again.','error');
+      return;
+    }
+
+    toast(msg || 'Sign in failed. Please try again.','error');
+  }
 }
+
+async function resendVerificationEmail(email){
+  if(!_sb||!email){toast('Could not resend email','error');return;}
+  try{
+    const {error}=await _sb.auth.resend({type:'signup',email});
+    if(error)throw error;
+    toast('Verification email resent! Check your inbox 📧','success');
+  }catch(e){
+    toast(e.message||'Failed to resend email','error');
+  }
+}
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  PAGE: REGISTER
@@ -1297,27 +1878,82 @@ function setRegRole(role){
   const vf=document.getElementById('vendor-fields');if(vf)vf.style.display=role==='vendor'?'block':'none';
   lucide.createIcons();
 }
-function doRegister(){
+async function doRegister(){
   const name=document.getElementById('reg-name')?.value.trim();
   const phone=document.getElementById('reg-phone')?.value.trim();
   const email=document.getElementById('reg-email')?.value.trim();
   const password=document.getElementById('reg-password')?.value;
   if(!name||!phone||!email||!password){toast('Please fill all fields','warning');return;}
   if(password.length<6){toast('Password must be at least 6 characters','warning');return;}
-  const users=DB.get('users',[]);
-  if(users.find(u=>u.email===email)){toast('Email already registered','error');return;}
-  const nu={id:'usr'+genId(),name,email,phone,password,role:regRole,status:regRole==='vendor'?'pending':'approved',createdAt:new Date().toISOString()};
+  let storeName='',location='',whatsapp='';
   if(regRole==='vendor'){
-    const store=document.getElementById('reg-store')?.value.trim();
-    const loc=document.getElementById('reg-location')?.value;
-    const wa=document.getElementById('reg-whatsapp')?.value.trim();
-    if(!store||!loc||!wa){toast('Please fill all vendor details','warning');return;}
-    nu.storeName=store;nu.location=loc;nu.whatsapp=wa;
+    storeName=document.getElementById('reg-store')?.value.trim();
+    location=document.getElementById('reg-location')?.value;
+    whatsapp=document.getElementById('reg-whatsapp')?.value.trim();
+    if(!storeName||!location||!whatsapp){toast('Please fill all vendor details','warning');return;}
   }
-  users.push(nu);DB.set('users',users);
-  if(regRole==='buyer'){setCurrentUser(nu);toast('Welcome to TrustLink! 🎉','success');showPage('home');}
-  else{toast('Vendor account submitted! Awaiting admin approval.','info');showPage('login');}
+  const btn=document.querySelector('[onclick="doRegister()"]');
+  if(btn){btn.disabled=true;btn.textContent='Creating account…';}
+  try{
+    const nu = await sbRegister({email,password,name,phone,role:regRole,storeName,location,whatsapp});
+    // Mirror into local DB layer so existing rendering code works
+    const users=DB.get('users',[]);
+    users.push({id:nu.id,name,email,phone,role:regRole,status:nu.status,storeName,location,whatsapp,createdAt:new Date().toISOString()});
+    DB.set('users',users);
+
+    if(regRole==='vendor'){
+      // Vendors always need admin approval first
+      showModal(`
+        <div class="text-center py-4">
+          <div class="text-5xl mb-4">🎉</div>
+          <h2 class="text-xl font-black mb-2">Vendor Account Created!</h2>
+          <p class="text-neutral-500 text-sm mb-4">Your account is pending admin approval.<br>
+          <strong class="text-green-700">Check your email</strong> to confirm your address, then wait for approval before signing in.</p>
+          <button onclick="closeModal();showPage('login')" class="btn-primary px-8 py-3 rounded-2xl font-bold">Go to Sign In</button>
+        </div>
+      `);
+    } else {
+      // Buyer — check if they got a session (email confirmation OFF) or need to confirm
+      if(nu.id && _sb){
+        const {data:{session}} = await _sb.auth.getSession();
+        if(session){
+          setCurrentUser(nu);
+          toast('Welcome to TrustLink! 🎉','success');
+          showPage('home');
+        } else {
+          showModal(`
+            <div class="text-center py-4">
+              <div class="text-5xl mb-4">📧</div>
+              <h2 class="text-xl font-black mb-2">Check Your Email!</h2>
+              <p class="text-neutral-500 text-sm mb-4">We sent a confirmation link to <strong>${email}</strong>.<br>
+              Click it to activate your account, then sign in.</p>
+              <button onclick="closeModal();showPage('login')" class="btn-primary px-8 py-3 rounded-2xl font-bold">Go to Sign In</button>
+            </div>
+          `);
+        }
+      } else {
+        setCurrentUser(nu);
+        toast('Welcome to TrustLink! 🎉','success');
+        showPage('home');
+      }
+    }
+  }catch(err){
+    // Friendly error messages for common Supabase errors
+    let msg = err.message || 'Registration failed. Please try again.';
+    if(msg.includes('already registered') || msg.includes('already been registered')) msg = 'This email is already registered. Try signing in instead.';
+    if(msg.includes('row-level security')) msg = 'Account created! Please check your email to confirm your address, then sign in.';
+    if(msg.includes('weak_password')) msg = 'Password is too weak. Use at least 6 characters with letters and numbers.';
+    if(msg.includes('row-level security')){
+      // The signUp succeeded but profile insert was blocked — treat as success
+      toast('Account created! Check your email to confirm, then sign in.','success');
+      showPage('login');
+    } else {
+      toast(msg,'error');
+      if(btn){btn.disabled=false;btn.textContent='Create Account';}
+    }
+  }
 }
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  PAGE: BUYER DASHBOARD
@@ -1327,7 +1963,18 @@ function pageDashboard(){
   if(u.role==='admin')return pageAdminDashboard();
   const orders=DB.get('orders',[]).filter(o=>o.buyerId===u.id);
   const totalSpent=orders.reduce((s,o)=>s+o.total,0);
-  const statusColors={confirmed:'text-blue-600',processing:'text-yellow-600',shipped:'text-purple-600',delivered:'text-green-600',cancelled:'text-red-500'};
+  const statusColors={
+    'awaiting-deposit':'text-yellow-600',
+    'escrow-held':'text-blue-600',
+    'settled-vendor':'text-green-600',
+    'refunded-buyer':'text-red-500',
+    'disputed':'text-purple-600',
+    confirmed:'text-blue-600',
+    processing:'text-yellow-600',
+    shipped:'text-purple-600',
+    delivered:'text-green-600',
+    cancelled:'text-red-500'
+  };
   return `
   <div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
     <!-- Profile header -->
@@ -1342,9 +1989,9 @@ function pageDashboard(){
     <div class="grid grid-cols-3 gap-4 mb-10">
       <div class="card-stat p-5 rounded-2xl"><div class="text-3xl font-black gradient-text">${orders.length}</div><div class="text-sm text-neutral-500 font-medium mt-1">Orders</div></div>
       <div class="card-stat p-5 rounded-2xl"><div class="text-2xl font-black gradient-text">GH₵${totalSpent.toLocaleString()}</div><div class="text-sm text-neutral-500 font-medium mt-1">Total Spent</div></div>
-      <div class="card-stat p-5 rounded-2xl"><div class="text-3xl font-black gradient-text">${orders.filter(o=>o.status==='delivered').length}</div><div class="text-sm text-neutral-500 font-medium mt-1">Delivered</div></div>
+      <div class="card-stat p-5 rounded-2xl"><div class="text-3xl font-black gradient-text">${orders.filter(o=>o.status==='settled-vendor'||o.status==='delivered').length}</div><div class="text-sm text-neutral-500 font-medium mt-1">Settled</div></div>
     </div>
-    <h2 class="text-xl font-black mb-5">My <span class="gradient-text">Orders</span></h2>
+    <h2 class="text-xl font-black mb-5">My <span class="gradient-text">Orders & Escrow</span></h2>
     ${orders.length===0?`
     <div class="card text-center py-24">
       <i data-lucide="package" style="width:52px;height:52px;margin:0 auto 16px;display:block;color:#d4d4d4"></i>
@@ -1354,16 +2001,73 @@ function pageDashboard(){
     <div class="space-y-4">
       ${orders.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(order=>{
         const vendor=DB.get('users',[]).find(u=>u.id===order.vendorId);
+        
+        let escrowBanner = '';
+        let actionButtons = '';
+        
+        if (order.status === 'awaiting-deposit') {
+          escrowBanner = `
+            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-3.5 text-xs font-semibold mt-3 flex items-start gap-2">
+              <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:1px"></i>
+              <div>
+                <strong>Awaiting Escrow Deposit:</strong> Please deposit GH₵${order.total.toLocaleString()} to the TrustLink Escrow MoMo wallet. The vendor will only ship AFTER the deposit is verified by admin.
+              </div>
+            </div>`;
+        } else if (order.status === 'escrow-held' || order.status === 'shipped') {
+          escrowBanner = `
+            <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl p-3.5 text-xs font-semibold mt-3 flex items-start gap-2">
+              <i data-lucide="shield-check" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:#15803d"></i>
+              <div>
+                <strong>Escrow Secured:</strong> Your payment is held safely in TrustLink Escrow. Vendor has been authorized to ship!
+              </div>
+            </div>`;
+          actionButtons = `
+            <button onclick="buyerConfirmDelivery('${order.id}', ${order.total})" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold">
+              Confirm Delivery
+            </button>
+            <button onclick="buyerRaiseDispute('${order.id}')" class="btn-danger px-4 py-2 rounded-xl text-xs font-bold">
+              Dispute Order
+            </button>`;
+        } else if (order.status === 'settled-vendor') {
+          escrowBanner = `
+            <div class="bg-neutral-50 border border-neutral-200 text-neutral-600 rounded-xl p-3.5 text-xs font-medium mt-3 flex items-start gap-2">
+              <i data-lucide="check" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:#16a34a"></i>
+              <div>
+                <strong>Settled:</strong> Delivery confirmed. Escrow funds have been successfully released to the vendor. Thank you for buying!
+              </div>
+            </div>`;
+        } else if (order.status === 'disputed') {
+          escrowBanner = `
+            <div class="bg-purple-50 border border-purple-200 text-purple-800 rounded-xl p-3.5 text-xs font-semibold mt-3 flex items-start gap-2">
+              <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:#7e22ce"></i>
+              <div>
+                <strong>Order Disputed:</strong> You raised a dispute: "${order.disputeReason || 'No reason provided'}". TrustLink admin will investigate and contact you.
+              </div>
+            </div>`;
+        } else if (order.status === 'refunded-buyer') {
+          escrowBanner = `
+            <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-3.5 text-xs font-semibold mt-3 flex items-start gap-2">
+              <i data-lucide="x-circle" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;color:#b91c1c"></i>
+              <div>
+                <strong>Refunded:</strong> Dispute settled in your favor. Funds have been returned to your mobile money number.
+              </div>
+            </div>`;
+        }
+
         return `
         <div class="card p-6">
           <div class="flex items-start justify-between mb-4">
             <div>
-              <div class="font-bold text-neutral-800">#${order.id.toUpperCase()}</div>
+              <div class="font-bold text-neutral-800 flex items-center gap-2">
+                #${order.id.toUpperCase()}
+                <span class="text-xs px-2 py-0.5 rounded-full capitalize font-bold bg-neutral-100 ${statusColors[order.status]||'text-neutral-500'}">
+                  ${order.status.replace('-',' ')}
+                </span>
+              </div>
               <div class="text-xs text-neutral-400 mt-1 font-medium">${vendor?.storeName||'Unknown'} · ${new Date(order.createdAt).toLocaleDateString('en-GH',{day:'numeric',month:'short',year:'numeric'})}</div>
             </div>
             <div class="text-right">
-              <div class="font-bold text-sm ${statusColors[order.status]||'text-neutral-500'} capitalize mb-1">${order.status}</div>
-              <div class="font-black price-tag">GH₵${order.total.toLocaleString()}</div>
+              <div class="font-black price-tag text-base">GH₵${order.total.toLocaleString()}</div>
             </div>
           </div>
           <div class="flex gap-2 flex-wrap mb-3">
@@ -1373,14 +2077,20 @@ function pageDashboard(){
               <span class="text-xs font-medium text-neutral-600">${i.title.slice(0,22)}${i.title.length>22?'…':''} ×${i.qty}</span>
             </div>`).join('')}
           </div>
-          <div class="flex items-center justify-between">
+          
+          ${escrowBanner}
+
+          <div class="flex items-center justify-between mt-4 pt-3 border-t border-neutral-100">
             <div class="flex gap-4 text-xs text-neutral-400 font-medium">
               <span class="flex items-center gap-1"><i data-lucide="map-pin" style="width:11px;height:11px"></i>${order.deliveryAddress}</span>
               <span class="flex items-center gap-1"><i data-lucide="credit-card" style="width:11px;height:11px"></i>${order.paymentMethod}</span>
             </div>
-            ${vendor?.whatsapp?`<a href="https://wa.me/233${vendor.whatsapp.replace(/^0/,'')}" target="_blank" class="btn-whatsapp flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold">
-              <i data-lucide="message-circle" style="width:13px;height:13px"></i> Chat vendor
-            </a>`:''}
+            <div class="flex gap-2">
+              ${actionButtons}
+              ${vendor?.whatsapp?`<a href="https://wa.me/233${vendor.whatsapp.replace(/^0/,'')}" target="_blank" class="btn-whatsapp flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold">
+                <i data-lucide="message-circle" style="width:13px;height:13px"></i> Chat vendor
+              </a>`:''}
+            </div>
           </div>
         </div>`;
       }).join('')}
@@ -1388,7 +2098,31 @@ function pageDashboard(){
   </div>`;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function buyerConfirmDelivery(orderId, total) {
+  if (!confirm(`Are you sure you have received your products in good condition? This will release GH₵${total.toLocaleString()} from Escrow to the Vendor.`)) return;
+  const orders = DB.get('orders', []);
+  const o = orders.find(ord => ord.id === orderId);
+  if (o) {
+    o.status = 'settled-vendor';
+    DB.set('orders', orders);
+    toast('Delivery confirmed! Funds released to vendor. 🎉', 'success');
+    showPage('dashboard');
+  }
+}
+
+function buyerRaiseDispute(orderId) {
+  const reason = prompt('Please describe the reason for your dispute (e.g. Item not received, wrong sizes, product damaged):');
+  if (!reason) return;
+  const orders = DB.get('orders', []);
+  const o = orders.find(ord => ord.id === orderId);
+  if (o) {
+    o.status = 'disputed';
+    o.disputeReason = reason;
+    DB.set('orders', orders);
+    toast('Dispute filed successfully. Admin is mediating.', 'warning');
+    showPage('dashboard');
+  }
+}// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  PAGE: VENDOR DASHBOARD
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function pageVendorDashboard(){
@@ -1399,8 +2133,9 @@ function pageVendorDashboard(){
     <h2 class="text-2xl font-black mb-3">Account Pending Approval</h2>
     <p class="text-neutral-400">Your vendor account is under review. You'll be approved within 24 hours.</p>
   </div>`;
-  const allProducts=DB.get('products',[]).filter(p=>p.vendorId===u.id);
-  const allOrders=DB.get('orders',[]).filter(o=>o.vendorId===u.id);
+  // Match both camelCase vendorId (seed data) and snake_case vendor_id (Supabase raw)
+  const allProducts=DB.get('products',[]).filter(p=>(p.vendorId===u.id)||(p.vendor_id===u.id));
+  const allOrders=DB.get('orders',[]).filter(o=>(o.vendorId===u.id)||(o.vendor_id===u.id));
   const revenue=allOrders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.total,0);
   const commission=allOrders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.commission,0);
   const at=window._vendorTab||'overview';
@@ -1433,8 +2168,8 @@ function pageVendorDashboard(){
 function setVendorTab(tab){
   window._vendorTab=tab;
   const u=getCurrentUser();
-  const ap=DB.get('products',[]).filter(p=>p.vendorId===u.id);
-  const ao=DB.get('orders',[]).filter(o=>o.vendorId===u.id);
+  const ap=DB.get('products',[]).filter(p=>(p.vendorId===u.id)||(p.vendor_id===u.id));
+  const ao=DB.get('orders',[]).filter(o=>(o.vendorId===u.id)||(o.vendor_id===u.id));
   const rev=ao.reduce((s,o)=>s+o.total,0);
   const com=ao.reduce((s,o)=>s+o.commission,0);
   const c=document.getElementById('vendor-tab-content');
@@ -1546,7 +2281,7 @@ function renderVendorOrders(ao){
   <div class="card overflow-hidden">
     <div class="overflow-x-auto">
     <table>
-      <thead><tr><th>Order ID</th><th>Items</th><th>Total</th><th>Commission</th><th>Status</th><th>Date</th><th>Update</th></tr></thead>
+      <thead><tr><th>Order ID</th><th>Items</th><th>Total</th><th>Commission</th><th>Escrow Status & Action</th><th>Date</th></tr></thead>
       <tbody>
         ${ao.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(o=>`
         <tr>
@@ -1554,13 +2289,37 @@ function renderVendorOrders(ao){
           <td class="text-xs text-neutral-500 max-w-xs truncate">${o.items.map(i=>i.title.slice(0,20)).join(', ')}</td>
           <td class="font-black price-tag">GH₵${o.total.toLocaleString()}</td>
           <td class="text-red-500 text-sm font-semibold">-GH₵${o.commission.toFixed(2)}</td>
-          <td><span class="badge badge-${o.status==='delivered'?'approved':o.status==='cancelled'?'rejected':'pending'} capitalize">${o.status}</span></td>
-          <td class="text-xs text-neutral-400">${new Date(o.createdAt).toLocaleDateString()}</td>
           <td>
-            <select onchange="updateOrderStatus('${o.id}',this.value)" class="input-field text-xs py-1.5 px-2 w-auto">
-              ${['confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
-            </select>
+            ${o.status === 'awaiting-deposit' ? `
+              <span class="text-xs text-yellow-600 font-bold bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-lg block w-fit">⚠️ AWAITING DEPOSIT — DO NOT SHIP</span>
+            ` : o.status === 'escrow-held' ? `
+              <div class="flex flex-col gap-1.5">
+                <span class="text-xs text-green-700 font-bold bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg block w-fit">🛡️ DEPOSIT SECURED — SAFE TO SHIP</span>
+                <select onchange="updateOrderStatus('${o.id}',this.value)" class="input-field text-xs py-1.5 px-2 w-auto">
+                  <option value="">Update Status...</option>
+                  <option value="shipped">Mark as Shipped</option>
+                  <option value="delivered">Mark as Delivered</option>
+                </select>
+              </div>
+            ` : o.status === 'shipped' ? `
+              <div class="flex flex-col gap-1.5">
+                <span class="text-xs text-blue-600 font-bold bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg block w-fit">📦 Shipped (In Transit)</span>
+                <select onchange="updateOrderStatus('${o.id}',this.value)" class="input-field text-xs py-1.5 px-2 w-auto">
+                  <option value="">Update Status...</option>
+                  <option value="delivered">Mark as Delivered</option>
+                </select>
+              </div>
+            ` : o.status === 'disputed' ? `
+              <span class="text-xs text-purple-700 font-bold bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-lg block w-fit">⚠️ Disputed (Mediating)</span>
+            ` : o.status === 'settled-vendor' ? `
+              <span class="text-xs text-green-700 font-bold bg-green-100 px-2.5 py-1 rounded-lg block w-fit">✅ Settled & Payout Released</span>
+            ` : o.status === 'refunded-buyer' ? `
+              <span class="text-xs text-red-600 font-bold bg-red-50 border border-red-200 px-2.5 py-1 rounded-lg block w-fit">🛑 Refunded to Buyer</span>
+            ` : `
+              <span class="text-xs text-neutral-500 font-medium capitalize block w-fit">${o.status}</span>
+            `}
           </td>
+          <td class="text-xs text-neutral-400">${new Date(o.createdAt).toLocaleDateString()}</td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -1569,11 +2328,114 @@ function renderVendorOrders(ao){
 }
 
 function updateOrderStatus(orderId,status){
+  if(!status)return;
   const orders=DB.get('orders',[]);const o=orders.find(o=>o.id===orderId);
-  if(o){o.status=status;DB.set('orders',orders);toast('Order status updated','success');}
+  if(o){
+    o.status=status;
+    DB.set('orders',orders);
+    toast(`Order status updated to: ${status.replace('-',' ')}`     ,'success');
+    setVendorTab('orders');
+  }
 }
 
+function startCameraSimulation() {
+  const catSelect = document.getElementById('ap-category');
+  const cat = catSelect ? catSelect.value : 'General';
+  toast('Accessing device camera... 📸', 'info');
+  
+  const mockpics = {
+    'Electronics': [
+      'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500'
+    ],
+    'Fashion & Clothing': [
+      'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=500',
+      'https://images.unsplash.com/photo-1618220179428-22790b461013?w=500',
+      'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=500'
+    ],
+    'Food & Beverages': [
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500',
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500',
+      'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=500'
+    ],
+    'Agriculture': [
+      'https://images.unsplash.com/photo-1593113598332-cd59c5bc3f90?w=500',
+      'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=500'
+    ]
+  };
+
+  const pool = mockpics[cat] || [
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500',
+    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'
+  ];
+
+  setTimeout(() => {
+    if (!window._simulatedPhotos) window._simulatedPhotos = [];
+    if (window._simulatedPhotos.length >= 6) {
+      toast('Maximum 6 storefront photos allowed.', 'warning');
+      return;
+    }
+    const randomPic = pool[Math.floor(Math.random() * pool.length)];
+    window._simulatedPhotos.push(randomPic);
+    toast('Photo captured successfully! 📸', 'success');
+    renderStorefrontCarousel();
+  }, 1000);
+}
+
+function removeSimPhoto(idx) {
+  if (window._simulatedPhotos) {
+    window._simulatedPhotos.splice(idx, 1);
+    renderStorefrontCarousel();
+  }
+}
+
+function renderStorefrontCarousel() {
+  const container = document.getElementById('camera-preview-carousel');
+  if (!container) return;
+  if (!window._simulatedPhotos) window._simulatedPhotos = [];
+  if (!window._capturedFiles) window._capturedFiles = [];
+  const allPreviews = [
+    ...window._capturedFiles.map((f,i) => ({ url: URL.createObjectURL(f), isFile: true, idx: i })),
+    ...window._simulatedPhotos.map((url,i) => ({ url, isFile: false, idx: i })),
+  ];
+  if (!allPreviews.length) {
+    container.innerHTML = '<p class="text-xs text-neutral-400 font-medium">No photos captured yet.</p>';
+    return;
+  }
+  container.innerHTML = allPreviews.map((item,i) => `
+    <div class="relative w-20 h-20 rounded-xl overflow-hidden border border-neutral-200 shadow-sm">
+      <img src="${item.url}" class="w-full h-full object-cover" />
+      <button onclick="${item.isFile ? `removeFilePhoto(${item.idx})` : `removeSimPhoto(${item.idx})`}"
+              class="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 shadow flex items-center justify-center">
+        <span style="font-size:10px;font-weight:900">X</span>
+      </button>
+      ${item.isFile ? '<div class="absolute bottom-0 left-0 right-0 bg-green-600/80 text-white text-[9px] font-bold text-center py-0.5">📷 Real</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function handleCameraCapture(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  if (!window._capturedFiles) window._capturedFiles = [];
+  const remaining = 6 - (window._capturedFiles.length + (window._simulatedPhotos||[]).length);
+  if (remaining <= 0) { toast('Maximum 6 storefront photos allowed.', 'warning'); return; }
+  const toAdd = files.slice(0, remaining);
+  window._capturedFiles.push(...toAdd);
+  toast(`${toAdd.length} photo${toAdd.length>1?'s':''} ready to upload 📸`, 'success');
+  renderStorefrontCarousel();
+  event.target.value = '';
+}
+
+function removeFilePhoto(idx) {
+  if (window._capturedFiles) { window._capturedFiles.splice(idx, 1); renderStorefrontCarousel(); }
+}
+
+
+
 function renderAddProductForm(u){
+  window._simulatedPhotos = [];
   const cats=['Electronics','Fashion & Clothing','Jewelry & Accessories','Home & Living','Food & Beverages','Health & Beauty','Agriculture','Art & Crafts','Sports & Outdoors','Books & Education'];
   return `
   <div class="max-w-2xl">
@@ -1600,12 +2462,33 @@ function renderAddProductForm(u){
         <div><label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Category *</label>
           <select id="ap-category" class="input-field"><option value="">Select category</option>${cats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
         </div>
+        
+        <!-- Camera storefront preview -->
+        <div class="bg-neutral-50 rounded-2xl p-5 border border-neutral-100">
+          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Storefront Photos (Camera or File)</label>
+          <div class="flex flex-wrap gap-3 mb-4" id="camera-preview-carousel">
+            <p class="text-xs text-neutral-400 font-medium">No photos captured yet.</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <!-- Real camera / file input -->
+            <input type="file" id="camera-file-input" accept="image/*" capture="environment"
+                   multiple class="hidden" onchange="handleCameraCapture(event)" />
+            <button type="button" onclick="document.getElementById('camera-file-input').click()"
+                    class="btn-primary py-2 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5">
+              <i data-lucide="camera" style="width:14px;height:14px"></i> Take / Upload Photo
+            </button>
+            <button type="button" onclick="startCameraSimulation()"
+                    class="btn-ghost py-2 px-4 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-neutral-200">
+              <i data-lucide="image" style="width:14px;height:14px"></i> Use Sample Photo
+            </button>
+          </div>
+        </div>
+
         <div>
-          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Product Images (up to 6 URLs)</label>
+          <label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Or Image URLs (up to 3 URLs)</label>
           <div class="space-y-2" id="image-inputs">
             ${[1,2,3].map(i=>`<input id="ap-img-${i}" class="input-field" placeholder="Image URL ${i} (https://…)" />`).join('')}
           </div>
-          <button onclick="addMoreImageFields()" class="text-xs text-green-700 font-semibold mt-2 hover:underline">+ Add more images</button>
         </div>
         <div class="flex gap-3 pt-2">
           <button onclick="setVendorTab('products')" class="btn-ghost flex-1 py-4 rounded-2xl font-semibold">Cancel</button>
@@ -1614,14 +2497,6 @@ function renderAddProductForm(u){
       </div>
     </div>
   </div>`;
-}
-
-let imgFieldCount=3;
-function addMoreImageFields(){
-  if(imgFieldCount>=6){toast('Maximum 6 images','warning');return;}
-  imgFieldCount++;
-  const c=document.getElementById('image-inputs');
-  const i=document.createElement('input');i.id=`ap-img-${imgFieldCount}`;i.className='input-field';i.placeholder=`Image URL ${imgFieldCount} (https://…)`;c.appendChild(i);
 }
 
 function aiSuggest(){
@@ -1648,20 +2523,51 @@ function aiSuggest(){
   },1300);
 }
 
-function submitProduct(vendorId){
+async function submitProduct(vendorId){
   const title=document.getElementById('ap-title')?.value.trim();
   const desc=document.getElementById('ap-desc')?.value.trim();
   const price=parseFloat(document.getElementById('ap-price')?.value);
   const stock=parseInt(document.getElementById('ap-stock')?.value);
   const category=document.getElementById('ap-category')?.value;
   if(!title||!desc||!price||!stock||!category){toast('Please fill all required fields','warning');return;}
-  const images=[];
-  for(let i=1;i<=6;i++){const v=document.getElementById(`ap-img-${i}`)?.value.trim();if(v)images.push(v);}
+  
+  const btn=document.querySelector('[onclick^="submitProduct"]');
+  if(btn){btn.disabled=true;btn.textContent='Uploading…';}
+
+  // Upload any captured camera files first
+  const u=sbCurrentUser()||getCurrentUser();
+  let images=[];
+  if(window._capturedFiles&&window._capturedFiles.length){
+    toast('Uploading photos to cloud…','info');
+    for(const file of window._capturedFiles){
+      try{
+        const url=await sbUploadProductImage(file,u?.id||vendorId);
+        images.push(url);
+      }catch(e){console.warn('Image upload failed:',e);}
+    }
+  }
+  // Simulated photos (Unsplash URLs)
+  if(window._simulatedPhotos&&window._simulatedPhotos.length)images=[...images,...window._simulatedPhotos];
+  // Manual URL inputs
+  for(let i=1;i<=3;i++){const v=document.getElementById(`ap-img-${i}`)?.value.trim();if(v)images.push(v);}
   if(!images.length)images.push('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600');
-  const ps=DB.get('products',[]);
-  ps.push({id:'prod'+genId(),vendorId,title,description:desc,price,stock,category,images,status:'pending',rating:0,reviews:0,createdAt:new Date().toISOString()});
-  DB.set('products',ps);imgFieldCount=3;
-  toast('Product submitted for approval!','success');window._vendorTab='products';showPage('vendor-dashboard');
+
+  try{
+    // Save to Supabase
+    const created=await SBProducts.create({title,description:desc,price,stock,category,images});
+    // Mirror to local DB for immediate rendering
+    const ps=DB.get('products',[]);
+    ps.push({id:created.id,vendorId:u?.id||vendorId,title,description:desc,price,stock,category,images,status:'pending',rating:0,reviews:0,createdAt:new Date().toISOString()});
+    DB.set('products',ps);
+    toast('Product submitted for approval! ✅','success');
+    window._vendorTab='products';
+    window._capturedFiles=[];
+    window._simulatedPhotos=[];
+    showPage('vendor-dashboard');
+  }catch(err){
+    toast(err.message||'Failed to submit product','error');
+    if(btn){btn.disabled=false;btn.textContent='Submit for Approval';}
+  }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1671,31 +2577,108 @@ function pageAdminDashboard(){
   const u=getCurrentUser();if(!u||u.role!=='admin')return'<div class="text-center py-40 text-neutral-400">Access Denied</div>';
   const users=DB.get('users',[]);const products=DB.get('products',[]);const orders=DB.get('orders',[]);
   const at=window._adminTab||'vendors';
+  
+  // Stats Calculations
+  const totalRevenue = orders.filter(o => o.status !== 'cancelled' && o.status !== 'refunded-buyer').reduce((sum, o) => sum + o.total, 0);
+  const totalEscrowHeld = orders.filter(o => o.status === 'escrow-held' || o.status === 'shipped').reduce((sum, o) => sum + o.total, 0);
+  const totalSettled = orders.filter(o => o.status === 'settled-vendor' || o.status === 'delivered').reduce((sum, o) => sum + o.total, 0);
+  const totalDisputed = orders.filter(o => o.status === 'disputed').reduce((sum, o) => sum + o.total, 0);
+  const approvedVendorsCount = users.filter(u => u.role === 'vendor' && u.status === 'approved').length;
+  const totalVendors = users.filter(u => u.role === 'vendor').length;
+  const vendorVerificationRate = totalVendors ? Math.round((approvedVendorsCount / totalVendors) * 100) : 0;
+
   return `
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
     <div class="flex items-center gap-4 mb-8">
       <div class="w-12 h-12 rounded-xl bg-brand flex items-center justify-center"><i data-lucide="shield" style="width:22px;height:22px;color:white"></i></div>
       <div><h1 class="text-2xl font-black">Admin Dashboard</h1><p class="text-neutral-400 text-sm font-medium">TrustLink Marketplace Management</p></div>
     </div>
-    <!-- Stats -->
+    
+    <!-- Quick Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       ${[
-        {v:users.filter(u=>u.role==='vendor').length,l:'Vendors',icon:'store'},
-        {v:products.length,l:'Products',icon:'package'},
-        {v:users.filter(u=>u.role==='buyer').length,l:'Buyers',icon:'users'},
-        {v:orders.length,l:'Orders',icon:'shopping-bag'},
+        {v:users.filter(u=>u.role==='vendor').length,l:`Vendors (${vendorVerificationRate}% Approved)`,icon:'store'},
+        {v:products.length,l:'Products listed',icon:'package'},
+        {v:`GH₵${totalRevenue.toLocaleString()}`,l:'Total Escrow Volume',icon:'wallet'},
+        {v:orders.length,l:'Orders Placed',icon:'shopping-bag'},
       ].map(s=>`
       <div class="card-stat p-5 rounded-2xl flex items-center gap-4">
         <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
           <i data-lucide="${s.icon}" style="width:20px;height:20px;color:#166534"></i>
         </div>
-        <div><div class="text-2xl font-black gradient-text">${s.v}</div><div class="text-xs text-neutral-400 font-medium mt-0.5">${s.l}</div></div>
+        <div><div class="text-xl font-black gradient-text">${s.v}</div><div class="text-xs text-neutral-400 font-medium mt-0.5">${s.l}</div></div>
       </div>`).join('')}
     </div>
+
+    <!-- Interactive Charts & Reports -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <!-- Escrow Wallet Health -->
+      <div class="card p-6">
+        <h3 class="font-bold text-neutral-800 mb-4 flex items-center gap-2">
+          <i data-lucide="shield-check" style="width:18px;height:18px;color:#16a34a"></i>
+          Escrow Wallet Breakdown
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span class="text-neutral-500">Secured Held in Escrow</span>
+              <span class="text-blue-600 font-bold">GH₵${totalEscrowHeld.toLocaleString()}</span>
+            </div>
+            <div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-blue-600 h-full animate-pulse" style="width: ${totalRevenue ? (totalEscrowHeld / totalRevenue * 100) : 0}%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span class="text-neutral-500">Settled & Paid Out</span>
+              <span class="text-green-600 font-bold">GH₵${totalSettled.toLocaleString()}</span>
+            </div>
+            <div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-green-600 h-full" style="width: ${totalRevenue ? (totalSettled / totalRevenue * 100) : 0}%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span class="text-neutral-500">Currently Disputed</span>
+              <span class="text-purple-600 font-bold">GH₵${totalDisputed.toLocaleString()}</span>
+            </div>
+            <div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-purple-600 h-full" style="width: ${totalRevenue ? (totalDisputed / totalRevenue * 100) : 0}%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Category Distribution -->
+      <div class="card p-6">
+        <h3 class="font-bold text-neutral-800 mb-4 flex items-center gap-2">
+          <i data-lucide="bar-chart-2" style="width:18px;height:18px;color:#eab308"></i>
+          Product Category Distribution
+        </h3>
+        <div class="space-y-3 max-h-36 overflow-y-auto">
+          ${(() => {
+            const counts = {};
+            products.forEach(p => counts[p.category] = (counts[p.category] || 0) + 1);
+            const total = products.length || 1;
+            return Object.entries(counts).map(([cat, count]) => `
+              <div>
+                <div class="flex justify-between text-2xs font-semibold mb-0.5">
+                  <span class="text-neutral-500">${cat}</span>
+                  <span class="text-neutral-700">${count} (${Math.round(count/total*100)}%)</span>
+                </div>
+                <div class="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-brand h-full" style="width: ${count/total*100}%"></div>
+                </div>
+              </div>
+            `).join('');
+          })()}
+        </div>
+      </div>
+    </div>
+
     <!-- Tabs -->
-    <div class="tab-bar flex mb-8">
-      ${['vendors','products','users'].map(tab=>`
-      <button onclick="setAdminTab('${tab}')" class="tab-btn flex-1 ${at===tab?'active':''}">${tab.charAt(0).toUpperCase()+tab.slice(1)}</button>
+    <div class="tab-bar flex flex-wrap mb-8">
+      ${['vendors','products','escrow','users'].map(tab=>`
+      <button onclick="setAdminTab('${tab}')" class="tab-btn flex-1 ${at===tab?'active':''}">${tab.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase())}</button>
       `).join('')}
     </div>
     <div id="admin-tab-content">${renderAdminTab(at,users,products,orders)}</div>
@@ -1716,6 +2699,7 @@ function setAdminTab(tab){
 function renderAdminTab(tab,us,ps,os){
   if(tab==='vendors')return renderAdminVendors(us.filter(u=>u.role==='vendor'));
   if(tab==='products')return renderAdminProducts(ps,us);
+  if(tab==='escrow')return renderAdminEscrow(os,us);
   if(tab==='users')return renderAdminUsers(us);
   return'';
 }
@@ -1757,14 +2741,21 @@ function approveVendor(vid){
 function editVendorAdmin(vid){
   const v=DB.get('users',[]).find(u=>u.id===vid);if(!v)return;
   showModal(`
-    <h2 class="text-xl font-black mb-6">Edit Vendor</h2>
+    <h2 class="text-xl font-black mb-6">Edit Vendor Profile</h2>
     <div class="space-y-4">
       <div><label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Store Name</label><input id="ev-store" class="input-field" value="${v.storeName||''}" /></div>
       <div><label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">Location</label><input id="ev-loc" class="input-field" value="${v.location||''}" /></div>
       <div><label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">WhatsApp</label><input id="ev-wa" class="input-field" value="${v.whatsapp||''}" /></div>
+      <div><label class="text-xs font-bold text-neutral-500 mb-2 block uppercase tracking-wide">KYC Verification Status</label>
+        <select id="ev-status" class="input-field">
+          <option value="pending" ${v.status==='pending'?'selected':''}>Pending Verification</option>
+          <option value="approved" ${v.status==='approved'?'selected':''}>Approved & Verified</option>
+          <option value="rejected" ${v.status==='rejected'?'selected':''}>Rejected / Suspended</option>
+        </select>
+      </div>
       <div class="flex gap-3 pt-2">
         <button onclick="closeModal()" class="btn-ghost flex-1 py-3 rounded-xl font-semibold">Cancel</button>
-        <button onclick="saveVendorAdmin('${vid}')" class="btn-primary flex-1 py-3 rounded-xl font-semibold">Save</button>
+        <button onclick="saveVendorAdmin('${vid}')" class="btn-primary flex-1 py-3 rounded-xl font-semibold">Save Profile</button>
       </div>
     </div>
   `);
@@ -1775,7 +2766,8 @@ function saveVendorAdmin(vid){
   us[idx].storeName=document.getElementById('ev-store').value.trim();
   us[idx].location=document.getElementById('ev-loc').value.trim();
   us[idx].whatsapp=document.getElementById('ev-wa').value.trim();
-  DB.set('users',us);closeModal();toast('Vendor updated!','success');setAdminTab('vendors');
+  us[idx].status=document.getElementById('ev-status').value;
+  DB.set('users',us);closeModal();toast('Vendor profile updated successfully!','success');setAdminTab('vendors');
 }
 
 function deleteUserAdmin(uid){
@@ -1861,6 +2853,115 @@ function deleteProductAdmin(pid){
   toast('Product deleted','info');setAdminTab('products');
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  REAL-TIME ESCROW & DISPUTES RENDERER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderAdminEscrow(orders, users) {
+  if(!orders.length)return`<div class="card text-center py-20"><p class="text-neutral-400 font-medium">No escrow transactions found.</p></div>`;
+  
+  return `
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Buyer</th>
+            <th>Vendor</th>
+            <th>Total Price</th>
+            <th>Escrow Status</th>
+            <th>Dispute Details</th>
+            <th>Mediation / Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${orders.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map(o => {
+            const buyer = users.find(u => u.id === o.buyerId);
+            const vendor = users.find(u => u.id === o.vendorId);
+            
+            let statusBadge = '';
+            if (o.status === 'awaiting-deposit') statusBadge = '<span class="badge badge-pending">Awaiting Deposit</span>';
+            else if (o.status === 'escrow-held') statusBadge = '<span class="badge badge-approved" style="background:#dbeafe;color:#1e40af">Escrow Held</span>';
+            else if (o.status === 'shipped') statusBadge = '<span class="badge badge-approved" style="background:#e0f2fe;color:#0369a1">Shipped</span>';
+            else if (o.status === 'settled-vendor') statusBadge = '<span class="badge badge-approved">Settled to Vendor</span>';
+            else if (o.status === 'refunded-buyer') statusBadge = '<span class="badge badge-rejected">Refunded to Buyer</span>';
+            else if (o.status === 'disputed') statusBadge = '<span class="badge badge-pending" style="background:#f3e8ff;color:#6b21a8">⚠️ Disputed</span>';
+            else statusBadge = `<span class="badge badge-pending capitalize">${o.status}</span>`;
+
+            let actionBtn = '';
+            if (o.status === 'awaiting-deposit') {
+              actionBtn = `<button onclick="adminConfirmDeposit('${o.id}')" class="btn-primary text-2xs px-2.5 py-1.5 rounded-lg font-bold">Confirm Deposit</button>`;
+            } else if (o.status === 'escrow-held' || o.status === 'shipped') {
+              actionBtn = `
+                <div class="flex gap-1">
+                  <button onclick="adminReleaseFunds('${o.id}')" class="btn-primary text-2xs px-2 py-1 rounded-lg font-bold" style="background:#16a34a">Release</button>
+                  <button onclick="adminRefundBuyer('${o.id}')" class="btn-danger text-2xs px-2 py-1 rounded-lg font-bold">Refund</button>
+                </div>`;
+            } else if (o.status === 'disputed') {
+              actionBtn = `
+                <div class="flex flex-col gap-1">
+                  <button onclick="adminReleaseFunds('${o.id}')" class="btn-primary text-2xs px-2 py-1 rounded-lg font-bold" style="background:#16a34a">Settle: Release</button>
+                  <button onclick="adminRefundBuyer('${o.id}')" class="btn-danger text-2xs px-2 py-1 rounded-lg font-bold">Settle: Refund</button>
+                </div>`;
+            } else {
+              actionBtn = '<span class="text-2xs text-neutral-400 font-semibold">Settled</span>';
+            }
+
+            return `
+            <tr>
+              <td class="font-mono text-xs font-bold">#${o.id.toUpperCase()}</td>
+              <td>
+                <div class="text-xs font-bold text-neutral-800">${o.buyerName || buyer?.name || 'Unknown'}</div>
+                <div class="text-3xs text-neutral-400">${buyer?.email || ''}</div>
+              </td>
+              <td class="text-xs font-semibold text-neutral-600">${vendor?.storeName || 'Unknown Store'}</td>
+              <td class="font-black price-tag text-xs">GH₵${o.total.toLocaleString()}</td>
+              <td>${statusBadge}</td>
+              <td class="text-xs max-w-xs truncate text-purple-700 font-semibold italic">
+                ${o.status === 'disputed' ? (o.disputeReason || 'No reason specified') : '<span class="text-neutral-300">-</span>'}
+              </td>
+              <td>${actionBtn}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function adminConfirmDeposit(orderId) {
+  const orders = DB.get('orders', []);
+  const o = orders.find(ord => ord.id === orderId);
+  if (o) {
+    o.status = 'escrow-held';
+    DB.set('orders', orders);
+    toast('Deposit verified! Escrow is now secured.', 'success');
+    setAdminTab('escrow');
+  }
+}
+
+function adminReleaseFunds(orderId) {
+  const orders = DB.get('orders', []);
+  const o = orders.find(ord => ord.id === orderId);
+  if (o) {
+    o.status = 'settled-vendor';
+    DB.set('orders', orders);
+    toast('Funds successfully released from Escrow to the Vendor.', 'success');
+    setAdminTab('escrow');
+  }
+}
+
+function adminRefundBuyer(orderId) {
+  const orders = DB.get('orders', []);
+  const o = orders.find(ord => ord.id === orderId);
+  if (o) {
+    o.status = 'refunded-buyer';
+    DB.set('orders', orders);
+    toast('Funds successfully refunded from Escrow back to the Buyer.', 'info');
+    setAdminTab('escrow');
+  }
+}
+
 function renderAdminUsers(users){
   return`
   <div class="card overflow-hidden">
@@ -1911,9 +3012,15 @@ function doResetPw(uid){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  INIT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function init(){
+async function init(){
   seedData();
-  currentUser=DB.getObj('currentUser',null);
+  // Restore Supabase session (takes priority over localStorage)
+  const sbUser = await sbGetSession();
+  if(sbUser){
+    setCurrentUser(sbUser);
+  } else {
+    currentUser=DB.getObj('currentUser',null);
+  }
   updateHeader();
   showPage('home');
 
@@ -1923,6 +3030,14 @@ function init(){
   console.log('%c🔑 Admin Password: kingdevilgh.com','color:#15803d;font-size:13px;font-weight:700');
   console.log('%c📧 Admin email: admin@trustlink.gh','color:#525252;font-size:12px');
   console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━','color:#d97706');
+}
+
+// Wrap localStorage logout to also sign out of Supabase
+async function doLogout(){
+  await sbLogout();
+  setCurrentUser(null);
+  showPage('home');
+  toast('Logged out successfully','info');
 }
 
 document.querySelectorAll('[data-page]').forEach(el=>{
