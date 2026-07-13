@@ -53,18 +53,69 @@ async function sbGetSession() {
   }
 }
 
-// Listen for auth state changes (login, logout, tab restore)
+// Listen for auth state changes (login, logout, tab restore, email confirmation)
 if (_sb) {
   _sb.auth.onAuthStateChange(async (event, session) => {
+    console.log('[TrustLink] Auth event:', event);
+
     if (session) {
       try {
-        const { data: profile } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+        // Try to fetch existing profile
+        let { data: profile } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+
+        // EMAIL_CONFIRMED or first SIGNED_IN after confirmation → auto-create profile
+        if (!profile && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
+          const meta = session.user.user_metadata || {};
+          const role  = meta.role || 'buyer';
+          const profileData = {
+            id:         session.user.id,
+            name:       meta.name       || session.user.email.split('@')[0],
+            email:      session.user.email,
+            phone:      meta.phone      || '',
+            role,
+            status:     role === 'buyer' ? 'approved' : 'pending',
+            store_name: meta.store_name || null,
+            location:   meta.location   || null,
+            whatsapp:   meta.whatsapp   || null,
+          };
+          const { data: created } = await _sb.from('profiles').upsert(profileData).select().single();
+          profile = created || profileData;
+        }
+
         _currentUser = normaliseProfile(profile);
-      } catch (e) { _currentUser = null; }
+
+        // ── Auto-redirect after email confirmation ──────────────────────
+        // When a user clicks the confirmation link Supabase fires SIGNED_IN
+        // with the URL hash containing #access_token. We detect this and
+        // redirect the user to the correct page automatically.
+        const isConfirmationCallback =
+          window.location.hash.includes('access_token') ||
+          window.location.search.includes('confirmation_token') ||
+          window.location.search.includes('token_hash');
+
+        if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && isConfirmationCallback) {
+          // Clean the URL so the token doesn't stay visible
+          history.replaceState(null, '', window.location.pathname);
+
+          // Show success toast and route user
+          if (typeof showToast === 'function') {
+            showToast('✅ Email confirmed! You are now logged in.', 'success');
+          }
+          if (typeof showPage === 'function') {
+            const dest = (_currentUser?.role === 'vendor') ? 'dashboard' : 'home';
+            setTimeout(() => showPage(dest), 600);
+          }
+        }
+
+      } catch (e) {
+        console.warn('[TrustLink] Auth state change error:', e.message);
+        _currentUser = null;
+      }
     } else {
       _currentUser = null;
     }
-    if (typeof updateHeader === 'function') updateHeader();
+
+    if (typeof updateHeader    === 'function') updateHeader();
     if (typeof updateCartBadge === 'function') updateCartBadge();
   });
 }
