@@ -1902,51 +1902,30 @@ async function doRegister(){
     DB.set('users',users);
 
     if(regRole==='vendor'){
-      // Vendors always need admin approval first
+      // Vendors need admin approval — no email step
       showModal(`
         <div class="text-center py-4">
           <div class="text-5xl mb-4">🎉</div>
           <h2 class="text-xl font-black mb-2">Vendor Account Created!</h2>
-          <p class="text-neutral-500 text-sm mb-4">Your account is pending admin approval.<br>
-          <strong class="text-green-700">Check your email</strong> to confirm your address, then wait for approval before signing in.</p>
+          <p class="text-neutral-500 text-sm mb-4">Your account is <strong>pending admin approval</strong>.<br>
+          You will be notified once approved. You can sign in after approval.</p>
           <button onclick="closeModal();showPage('login')" class="btn-primary px-8 py-3 rounded-2xl font-bold">Go to Sign In</button>
         </div>
       `);
     } else {
-      // Buyer — check if they got a session (email confirmation OFF) or need to confirm
-      if(nu.id && _sb){
-        const {data:{session}} = await _sb.auth.getSession();
-        if(session){
-          setCurrentUser(nu);
-          toast('Welcome to TrustLink! 🎉','success');
-          showPage('home');
-        } else {
-          showModal(`
-            <div class="text-center py-4">
-              <div class="text-5xl mb-4">📧</div>
-              <h2 class="text-xl font-black mb-2">Check Your Email!</h2>
-              <p class="text-neutral-500 text-sm mb-4">We sent a confirmation link to <strong>${email}</strong>.<br>
-              Click it to activate your account, then sign in.</p>
-              <button onclick="closeModal();showPage('login')" class="btn-primary px-8 py-3 rounded-2xl font-bold">Go to Sign In</button>
-            </div>
-          `);
-        }
-      } else {
-        setCurrentUser(nu);
-        toast('Welcome to TrustLink! 🎉','success');
-        showPage('home');
-      }
+      // Buyer — log in immediately, no email verification needed
+      setCurrentUser(nu);
+      toast('Welcome to TrustLink! 🎉','success');
+      showPage('home');
     }
   }catch(err){
-    // Friendly error messages for common Supabase errors
     let msg = err.message || 'Registration failed. Please try again.';
     if(msg.includes('already registered') || msg.includes('already been registered')) msg = 'This email is already registered. Try signing in instead.';
-    if(msg.includes('row-level security')) msg = 'Account created! Please check your email to confirm your address, then sign in.';
     if(msg.includes('weak_password')) msg = 'Password is too weak. Use at least 6 characters with letters and numbers.';
     if(msg.includes('row-level security')){
-      // The signUp succeeded but profile insert was blocked — treat as success
-      toast('Account created! Check your email to confirm, then sign in.','success');
-      showPage('login');
+      // Profile insert blocked by RLS — auth user was created, just log them in
+      toast('Account created! Signing you in…','success');
+      showPage('home');
     } else {
       toast(msg,'error');
       if(btn){btn.disabled=false;btn.textContent='Create Account';}
